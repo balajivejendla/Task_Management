@@ -42,3 +42,15 @@
   color:black
 
 }
+
+.custom_css1{
+  min-height: 90vh;
+  display: flex; 
+  flex-direction: column;
+  background-size: auto;
+
+  background:linear-gradient(#ffffff,#87c39e);
+}
+.custom_css2{
+  background-color: #80dfa4 !important;
+}

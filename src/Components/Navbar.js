@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
 import {Link} from 'react-router-dom';
+
+
+
+
 function Navbar(){
     return(
         <>
-              <nav className="navbar navbar-expand-lg bg-body-tertiary">
+     <nav className="navbar navbar-expand-lg" style={{ backgroundColor: "#87c39e" }}>
   <div className="container-fluid">
     <a className="navbar-brand fw-bold text-dark">Task Management</a>
     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">

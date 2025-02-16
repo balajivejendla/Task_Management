@@ -15,16 +15,18 @@ function App() {
   return (
     <>
       
-
-<div><Navbar/></div>
+      
+<Navbar/>
 <br/>
+<div className=" custom_css1">
 <Routes>
 <Route path='/' element={<div className="conatiner"><Tasks/></div>}/>
 
 <Route path='/Features' element={<div className="container" ><Features/></div>}/>
 </Routes>
-
+</div>
     </>
+    
 
   );
 }

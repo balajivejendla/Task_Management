@@ -50,7 +50,7 @@ return(
 <br/>
 
 <div className="d-grid gap-2 col-6 mx-auto">
-  <button className="btn btn-primary" type="button" onClick={taskadder}>Add Task</button>
+  <button disabled={Text1.length==0}className="btn btn-primary" type="button" onClick={taskadder}>Add Task</button>
   </div>
   <br/>
   <div className="d-flex justify-content-center align-items-center flex-column">
