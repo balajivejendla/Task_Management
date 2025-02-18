@@ -24,17 +24,32 @@ Drag-and-drop functionality for reordering tasks easily.</strong>
       Task Completion & Deletion
       </button>
     </h2>
-    <div id="collapseTwo" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+    <div id="collapseTwo" className="accordion-collapse collapse " data-bs-parent="#accordionExample">
       <div className="accordion-body">
         <strong> Mark tasks as completed with a simple checkbox or button.
-A "Delete" button to remove tasks from the list.
+A "Complete" button to remove tasks from the list.
 Option to undo deletion or move tasks to an "Archive" before permanent removal.</strong> 
       </div>
     </div>
+    
   </div>
+  <div className="accordion-item">
+    <h2 className="accordion-header">
+      <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
+      Task Reminder
+      </button>
+    </h2>
+    <div id="collapseThree" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div className="accordion-body">
+        <strong>You can get alert when Task deadline comes which is good and we can view the task which has Reminders and will removed when clicked submit which is actually a good feature</strong> 
+      </div>
+    </div>
+    
+  </div>
+  
   <br/><br/>
   <div className="mb-3">
-  <label for="exampleFormControlTextarea1" className="form-label">Any Suggestions:</label>
+  <label htmlFor="exampleFormControlTextarea1" className="form-label">Any Suggestions:</label>
   <textarea className="form-control" id="exampleFormControlTextarea1" style={{borderBlock:"5px solid black"}}rows="3"></textarea>
   <br/>
   <button type="button" className="btn btn-success">submit</button>

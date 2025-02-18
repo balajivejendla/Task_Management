@@ -10,6 +10,7 @@ import {Link} from 'react-router-dom';
 import Navbar from './Components/Navbar';
 
 
+
 function App() {
 
   return (
@@ -25,6 +26,7 @@ function App() {
 <Route path='/Features' element={<div className="container" ><Features/></div>}/>
 </Routes>
 </div>
+
     </>
     
 
