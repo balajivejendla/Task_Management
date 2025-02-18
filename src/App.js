@@ -18,7 +18,7 @@ function App() {
       
       
 <Navbar/>
-<br/>
+
 <div className=" custom_css1">
 <Routes>
 <Route path='/' element={<div className="conatiner"><Tasks/></div>}/>
@@ -28,7 +28,6 @@ function App() {
 </div>
 
     </>
-    
 
   );
 }

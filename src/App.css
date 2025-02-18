@@ -10,6 +10,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
+    margin-left:0;
   }
 }
 
@@ -44,13 +45,52 @@
 }
 
 .custom_css1{
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex; 
   flex-direction: column;
   background-size: auto;
 
-  background:linear-gradient(#ffffff,#87c39e);
+  background:linear-gradient(#F7F3E9,#A8D5BA);
 }
-.custom_css2{
-  background-color: #80dfa4 !important;
+
+.small_screens{
+  margin-left:110px;
+  font-size:22px
+}
+@media (max-width: 576px) {
+  .small_screens {
+    margin-left: 0; 
+    text-align: center; 
+  }
+}
+.task-item{
+  font-size: 24px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+@media (max-width: 576px) {
+  .task-item {
+    font-size: 18px; 
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  .task-item button {
+    font-size: 16px; 
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}
+
+
+input::placeholder {
+  color: #D4A373; /* Change this to your desired color */
+  opacity: 1; /* Ensure full opacity in some browsers */
+}
+textarea::placeholder {
+  color: #D4A373; /* Change this to your desired color */
+  opacity: 1; /* Ensure full opacity in some browsers */
+}
+.body{
+  background-color: "#278f52";
 }

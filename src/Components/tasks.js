@@ -1,4 +1,5 @@
 import React, { useState ,useEffect} from 'react'
+
 function Tasks(){
 
       const[Text1,setText1]=useState('');
@@ -54,9 +55,9 @@ function Tasks(){
 
 
 
-         const [reminders, setReminders] = useState([]); // Store multiple reminders
+         const [reminders, setReminders] = useState([]); 
        
-         // Add new reminder to the list
+
          const handleSetReminder = () => {
            if (!Text1 || !Text2) {
              alert("Please enter a reminder message and time.");
@@ -71,7 +72,7 @@ function Tasks(){
            setReminders((prevReminders) => [...prevReminders, newReminder]);
            alert(`Reminder set for ${Text2}.`);
        
-           // Clear input fields after adding a reminder
+
            setText1("");
            setText2("");
          };
@@ -83,18 +84,17 @@ function Tasks(){
              const currentTime = new Date().toLocaleTimeString([], {
                hour: "2-digit",
                minute: "2-digit",
-               hour12: true,
+               hour12: false,
              });
        
-             // Find reminders that match the current time
+
              const triggeredReminders = reminders.filter((reminder) => reminder.time === currentTime);
        
              if (triggeredReminders.length > 0) {
                triggeredReminders.forEach((reminder) => {
                  alert(`Reminder: ${reminder.text}`);
                });
-       
-               // Remove the triggered reminders from the list
+
                setReminders((prevReminders) =>
                  prevReminders.filter((reminder) => !triggeredReminders.includes(reminder))
                );
@@ -107,14 +107,16 @@ function Tasks(){
     
 return(
     <>
+    <br/>
+    <br/>
 <div className="d-flex justify-content-center allign items-center ">
-<p style={{fontSize:"22px",marginRight:"30px"}}>Task Subject :</p>
-<input className="form-control-lg w-50" type="text" placeholder="Enter the Task Name Here" value={Text1} onChange={handleonchange1}></input>
+<p style={{color:"#4A6656",fontSize:"22px",marginRight:"35px",fontWeight:600}}>Task Subject :</p>
+<input className="form-control-lg w-50" type="text" placeholder="Enter the Task Name Here" value={Text1} onChange={handleonchange1} style={{color:"#5C4033",backgroundColor:"#FAF3DD",border:"2px solid #D4A373",outline: "none"}}></input>
 </div>
 <br/>
 <div className="d-flex justify-content-center allign items-center">
-<p  style={{fontSize:"22px",marginLeft:"110px"}}>Task Deadline:</p>
-<input readOnly className="form-control-lg w-50" type="text" placeholder="Click on Clock Button to Enter Time" value={Text2} onChange={handleonchange2} style={{marginLeft:"30px"}}></input>
+<div className="small_screens" style={{color:"#4A6656",fontWeight:600}} >Task Deadline :</div>
+<input readOnly className="form-control-lg w-50" type="text" placeholder="Click on Clock Button to Enter Time" value={Text2} onChange={handleonchange2} style={{marginLeft:"30px",backgroundColor:"#FAF3DD",border:"2px solid #D4A373",outline: "none"}}></input>
 <input
           type="time"
           value={Text2}
@@ -123,30 +125,33 @@ return(
             e.target.value
           );
         }}
-        style={{fontSize:"22px",marginLeft:"20px"}}
+        style={{fontSize:"22px",marginLeft:"20px",backgroundColor:"#FAF3DD",border:"2px solid #D4A373",outline: "none"}}
 
         />
 
 </div>
 <br/>
 <div className="d-flex justify-content-center allign items-center">
-  <label htmlFor="exampleFormControlTextarea1" className="form-label" style={{fontSize:"22px",marginRight:"90px"}}>Notes :</label>
-  <textarea className="form-control-lg w-50" id="exampleFormControlTextarea1" placeholder="Enter the Notes Here" rows="5" value={Text3}onChange={handleonchange3}></textarea>
+  <label htmlFor="exampleFormControlTextarea1" className="form-label" style={{fontSize:"22px",marginRight:"95px",color:"#4A6656",fontWeight:600}}>Notes :</label>
+  <textarea className="form-control-lg w-50" id="exampleFormControlTextarea1" placeholder="Enter the Notes Here" rows="5" value={Text3}onChange={handleonchange3} style={{color:"#5C4033",backgroundColor:"#FAF3DD",border:"2px solid #D4A373",outline: "none",marginLeft:"5px"}}></textarea>
 </div>
 <br/>
 
 <div className="d-grid gap-2 col-6 mx-auto">
-  <button disabled={Text1.length===0}className="btn btn-primary" type="button" onClick={taskadder}>Add Task</button>
-  <button disabled={Text1.length===0}className="btn btn-primary" type="button" onClick={()=>{taskadderwith();handleSetReminder();}}>Add Task with Reminder</button>
+  <button disabled={Text1.length===0}className="btn btn-success" type="button" onClick={taskadder} style={{color:"#ffffff",backgroundColor:"#77BFA3"}}>Add Task</button>
+  <button disabled={Text1.length===0}className="btn btn-success" type="button" onClick={()=>{taskadderwith();handleSetReminder();}} style={{color:"#77BFA3",backgroundColor:"#ffffff"}}>Add Task with Reminder</button>
   </div>
   <br/>
-  <div className="container">
+  <br/>
+  <div className="container" style={{border: "5px solid rgb(206, 169, 132)",padding:"20px 20px",borderRadius: "25px",backgroundColor:"#A8D5BA"}}>
+  <br/>
   <div className="row">
-    {/* First Column: Tasks without Reminders */}
-    <div className="col-md-6">
-      <h3 style={{marginLeft:"10px"}}>Tasks Added So Far without Reminders: </h3>
+
+    <div className="col-md-6 col-sm-6 col-12 text-center">
+      <h3 style={{color:"#5C4033",marginLeft:"10px"}}>Tasks Added So Far without Reminders: </h3>
+      <br/>
       {Tasks.length === 0 ? (
-        <p style={{ fontSize: "24px", fontWeight: "500", marginLeft: "10px" }}>
+        <p style={{ fontSize: "24px", fontWeight: "500", marginLeft: "10px",color:"#4A6656" }}>
           No Tasks Added without Reminder
         </p>
       ) : (
@@ -154,21 +159,18 @@ return(
           <div
             key={index}
             className="task-item"
-            style={{
-              fontSize: "24px",
-              fontWeight: "500"
-            }}
+
           >
             <p>
-              <strong style={{ marginRight: "10px", marginLeft: "10px" }}>
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
                 Subject:
               </strong>
               {task.subject},
-              <strong style={{ marginRight: "10px", marginLeft: "10px" }}>
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
                 Time:
               </strong>
               {task.time},
-              <strong style={{ marginRight: "10px", marginLeft: "10px" }}>
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
                 Notes:
               </strong>
               {task.notes}
@@ -185,34 +187,31 @@ return(
       )}
     </div>
 
-    {/* Second Column: Tasks with Reminders */}
-    <div className="col-md-6">
-      <h3 style={{marginLeft:"20px"}}>Tasks Added So Far with Reminders: </h3>
+
+    <div className="col-md-6 col-sm-6 col-12 text-center">
+      <h3 style={{marginLeft:"20px",color:"#5C4033"}}>Tasks Added So Far with Reminders: </h3>
+      <br/>
       {Taskwith.length === 0 ? (
-        <p style={{ fontSize: "24px", fontWeight: "500", marginLeft: "20px" }}>
+        <p style={{ fontSize: "24px", fontWeight: "500", marginLeft: "20px",color:"#4A6656" }}>
           No Tasks Added with Reminder
         </p>
       ) : (
         Taskwith.map((task1, index) => (
           <div
             key={index}
-            className="task-item"
-            style={{
-              fontSize: "24px",
-              fontWeight: "500",
-              marginLeft: "10px",
-            }}
+            className="task-item "
+
           >
             <p>
-              <strong style={{ marginRight: "10px", marginLeft: "10px" }}>
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
                 Subject:
               </strong>
               {task1.subject},
-              <strong style={{ marginRight: "10px", marginLeft: "10px" }}>
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
                 Time:
               </strong>
               {task1.time},
-              <strong style={{ marginRight: "10px", marginLeft: "10px" }}>
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
                 Notes:
               </strong>
               {task1.notes}
