@@ -94,3 +94,16 @@ textarea::placeholder {
 .body{
   background-color: "#278f52";
 }
+.accordion-button:focus,
+.accordion-button:not(.collapsed),
+.accordion-button.collapsed {
+    box-shadow: none !important;
+    outline: 0 !important;
+    border: none !important;
+}
+.btn-icon {
+  width: 20px;  /* Adjust size */
+  height: 20px;
+  margin-right: 8px; /* Space between icon and text */
+
+}

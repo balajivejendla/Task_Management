@@ -3,11 +3,12 @@ import React from 'react'
 function Features(){
     return(
         <>
+        <br/>
         <div className="accordion" id="accordionExample">
   <div className="accordion-item">
     <h2 className="accordion-header">
-      <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-      User-Friendly Task Dashboard
+      <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style={{backgroundColor:"#99bf9c"}}>
+      <strong>User-Friendly Task Dashboard</strong>
       </button>
     </h2>
     <div id="collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionExample">
@@ -20,8 +21,8 @@ Drag-and-drop functionality for reordering tasks easily.</strong>
   </div>
   <div className="accordion-item">
     <h2 className="accordion-header">
-      <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-      Task Completion & Deletion
+      <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"style={{backgroundColor:"#99bf9c"}}>
+      <strong>Task Completion & Deletion</strong>
       </button>
     </h2>
     <div id="collapseTwo" className="accordion-collapse collapse " data-bs-parent="#accordionExample">
@@ -35,8 +36,8 @@ Option to undo deletion or move tasks to an "Archive" before permanent removal.<
   </div>
   <div className="accordion-item">
     <h2 className="accordion-header">
-      <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
-      Task Reminder
+      <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseTwo"style={{backgroundColor:"#99bf9c"}}>
+      <strong>Task Reminder</strong>
       </button>
     </h2>
     <div id="collapseThree" className="accordion-collapse collapse" data-bs-parent="#accordionExample">

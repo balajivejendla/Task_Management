@@ -7,32 +7,45 @@ function Tasks(){
       const[Text3,setText3]=useState('');
       const[Tasks,setTasks]=useState([]);
       const[Taskwith,setTaskwith]=useState([]);
-      const taskadder=()=>{
-        if(Text1.trim()===""||Text2.trim()===""){
+      const[Taskcomplete,setTaskcomplete]=useState([]);
+      const taskadder = () => {
+        if (Text1.trim() === "" || Text2.trim() === "") {
             alert("Please Enter Both Task and Time if Notes");
             return;
         }
-        
-            setTasks([...Tasks,{subject:Text1,time:Text2,notes:Text3}]);
-            setText1("");
-            setText2("");
-            setText3("");
-            console.log(Tasks)
-
+            const newTask = { subject: Text1, time: Text2, notes: Text3 };
+    
+  
+        const updatedTasks = [...Tasks, newTask].sort((a, b) => {
+            return new Date(a.time) - new Date(b.time); 
+        });
+    
+        setTasks(updatedTasks);
+        setText1("");
+        setText2("");
+        setText3("");
+        console.log(updatedTasks);
+    };
+    const taskadderwith = () => {
+      if (Text1.trim() === "" || Text2.trim() === "") {
+          alert("Please Enter Both Task and Time if Notes");
+          return;
       }
-      const taskadderwith=()=>{
-        if(Text1.trim()===""||Text2.trim()===""){
-            alert("Please Enter Both Task and Time if Notes");
-            return;
-        }
-        
-            setTaskwith([...Taskwith,{subject:Text1,time:Text2,notes:Text3}]);
-            setText1("");
-            setText2("");
-            setText3("");
-            console.log(Taskwith)
-
-      }
+  
+      const newTask1 = { subject: Text1, time: Text2, notes: Text3 };
+  
+      // Add the task and sort in ascending order based on time
+      const updatedTask = [...Taskwith, newTask1].sort((a, b) => {
+          return new Date(a.time) - new Date(b.time); // Sorting in ascending order
+      });
+  
+      setTaskwith(updatedTask);
+      setText1("");
+      setText2("");
+      setText3("");
+      console.log(updatedTask);
+  };
+  
       const handleonchange1=(event)=>{
         setText1(event.target.value);
       }
@@ -43,14 +56,18 @@ function Tasks(){
         setText3(event.target.value);
       }
      const RemoveTask=(index)=>{
+      const completed_task=Tasks[index];
         setTasks(Tasks.filter((_, i) => i !== index));
+        setTaskcomplete([...Taskcomplete,completed_task]);
+        console.log(Taskcomplete)
         
        }
        const RemoveReminder=(index)=>{
         setReminders((prevReminder)=>prevReminder.filter((reminder)=>reminder.index!==index))
         alert("reminder has been removed")
+        const task_completed=Taskwith[index];
         setTaskwith(Taskwith.filter((_, i) => i !==index));
-
+        setTaskcomplete([...Taskcomplete,task_completed]);
        }
 
 
@@ -138,8 +155,8 @@ return(
 <br/>
 
 <div className="d-grid gap-2 col-6 mx-auto">
-  <button disabled={Text1.length===0}className="btn btn-success" type="button" onClick={taskadder} style={{color:"#ffffff",backgroundColor:"#77BFA3"}}>Add Task</button>
-  <button disabled={Text1.length===0}className="btn btn-success" type="button" onClick={()=>{taskadderwith();handleSetReminder();}} style={{color:"#77BFA3",backgroundColor:"#ffffff"}}>Add Task with Reminder</button>
+  <button disabled={Text1.length===0}className="btn btn-success" type="button" onClick={taskadder} style={{color:"#ffffff",backgroundColor:"#77BFA3" }}>Add Task </button>
+  <button disabled={Text1.length===0}className="btn btn-success" type="button" onClick={()=>{taskadderwith();handleSetReminder();}} style={{color:"#77BFA3",backgroundColor:"#ffffff"}}>Add Task with Reminder <img src="icon1.jpg" alt="icon" class="btn-icon"></img></button>
   </div>
   <br/>
   <br/>
@@ -227,8 +244,48 @@ return(
         ))
       )}
     </div>
+
   </div>
 </div>
+<br/>
+<div className="container text-center" style={{border: "5px solid rgb(206, 169, 132)",padding:"20px 20px",borderRadius: "25px",backgroundColor:"#A8D5BA"}}>
+
+      <h3 style={{color:"#5C4033",marginLeft:"10px"}}>Tasks Completed So Far: </h3>
+      <br/>
+      {Taskcomplete.length === 0 ? (
+        <p style={{ fontSize: "24px", fontWeight: "500", marginLeft: "10px",color:"#4A6656" }}>
+          No Tasks Completed yet
+        </p>
+      ) : (
+        Taskcomplete.map((task, index) => (
+          <div
+            key={index}
+            className="task-item"
+
+          >
+            <p>
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
+                Subject:
+              </strong>
+              {task.subject},
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
+                Time:
+              </strong>
+              {task.time},
+              <strong style={{color:"#4A6656", marginRight: "10px", marginLeft: "10px" }}>
+                Notes:
+              </strong>
+              {task.notes}
+              
+            </p>
+          </div>
+        ))
+      )}
+
+
+</div>
+<br/>
+
 
 
   </>
