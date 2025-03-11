@@ -8,7 +8,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Routes, Route } from "react-router-dom";
 import {Link} from 'react-router-dom';
 import Navbar from './Components/Navbar';
+import Contact from './Components/contactus';
 
+import Tip1 from './Components/Tips';
 
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
 <Route path='/' element={<div className="conatiner"><Tasks/></div>}/>
 
 <Route path='/Features' element={<div className="container" ><Features/></div>}/>
+<Route path='/Contactus' element={<div className="container" ><Contact/></div>}/>
+<Route path='/Tips' element={<div className="container" ><Tip1/></div>}/>
 </Routes>
 </div>
 
