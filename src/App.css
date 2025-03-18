@@ -107,3 +107,13 @@ textarea::placeholder {
   margin-right: 8px; /* Space between icon and text */
 
 }
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

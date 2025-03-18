@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import { Link as RouterLink } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 
+import { FaCheckCircle } from 'react-icons/fa';
 
 
 
-function Navbar(){
+function Navbar({completedTasksCount}){
     return(
         <>
     <nav className="navbar navbar-expand-lg fixed-top" style={{ backgroundColor: "#4A6656" }}>
@@ -33,7 +34,50 @@ function Navbar(){
                                 <RouterLink className="nav-link" to="/Tips" style={{color:"#FAF3DD"}}>Learning Tips</RouterLink>
                             </li>
 
+
                         </ul>
+                        <div className="d-flex justify-content-end" style={{ padding: "10px 20px" }}>
+  <ScrollLink
+    to="statistics-section"
+    smooth={true}
+    duration={200}
+    offset={-100} 
+    className="btn"
+    style={{
+      backgroundColor: "#77BFA3",
+      color: "#FAF3DD",
+      border: "none",
+      borderRadius: "20px",
+      padding: "8px 15px",
+      cursor: "pointer"
+    }}
+  >
+    📊 View Statistics
+  </ScrollLink>
+</div>
+                        <div className="d-flex align-items-center me-3">
+                            <div className="completed-tasks-indicator d-flex align-items-center" 
+                                style={{ 
+                                    backgroundColor: "#FAF3DD",
+                                    padding: "5px 15px",
+                                    borderRadius: "20px",
+                                    border: "2px solid #D4A373"
+                                }}>
+                                <FaCheckCircle style={{ 
+                                    color: "#77BFA3", 
+                                    marginRight: "8px", 
+                                    fontSize: "18px" 
+                                }}/>
+                                <span style={{ 
+                                    color: "#4A6656", 
+                                    fontWeight: "500",
+                                    fontSize: "14px"
+                                }}>
+                                    Completed: {completedTasksCount}
+                                </span>
+                            </div>
+                        </div>
+
                         <span className="navbar-text custom-brand1" style={{color:"#FAF3DD"}}>
                             Helps to do Tasks Easier
                         </span>
@@ -42,7 +86,7 @@ function Navbar(){
     
             </nav>
             <br/>
-            <br/>
+            
 
         </>
 

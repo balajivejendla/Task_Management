@@ -1,4 +1,8 @@
 import React, { useState ,useEffect} from 'react'
+import Navbar from './Navbar';
+import TaskAlert from './Alert';
+import { FaGithub, FaLinkedin, FaEnvelope, FaPhone } from 'react-icons/fa';
+
 
 function Tasks(){
 
@@ -13,13 +17,52 @@ function Tasks(){
       const [expandedTasks, setExpandedTasks] = useState({});
       const [activeTab, setActiveTab] = useState('active');
       const totalActiveTasks = Tasks.length + Taskwith.length;
+      const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
 const totalCompletedTasks = Taskcomplete.length;
 const [showTips, setShowTips] = useState(localStorage.getItem('hideTaskTips') !== 'true');
 const [completedTips, setCompletedTips] = useState(JSON.parse(localStorage.getItem('completedTips') || '[]'));
 const [isOpen, setIsOpen] = useState(false);
 const [priorityFilter, setPriorityFilter] = useState('all');
+const [userExperience, setUserExperience] = useState('beginner'); // beginner, intermediate, advanced
+const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
+const [autoSchedule, setAutoSchedule] = useState(false);
+const handleDateChange = (e) => {
+  const date = e.target.value;
+  setSelectedDate(date);
+  
+  // Automatically suggest priority based on date
+  if (userExperience === 'beginner') {
+    const suggestedPriority = suggestPriority(Text1, date);
+    setPriority(suggestedPriority);
+  }
+};
 
 
+const AdvancedFeatures = () => (
+  <div className="advanced-features p-3" style={{ 
+    backgroundColor: "#FAF3DD",
+    border: "1px solid #D4A373",
+    borderRadius: "8px",
+    marginTop: "20px"
+  }}>
+    <div className="d-flex justify-content-between align-items-center">
+      <h5 style={{ color: "#4A6656" }}>Advanced Features</h5>
+      <div className="form-check form-switch">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          checked={autoSchedule}
+          onChange={(e) => setAutoSchedule(e.target.checked)}
+        />
+        <label className="form-check-label" style={{ color: "#4A6656" }}>
+          Auto Schedule
+        </label>
+      </div>
+    </div>
+  </div>
+);
 const tips = [
   'Click ✅ to mark tasks as complete',
   'Use high priority for urgent tasks',
@@ -39,7 +82,18 @@ const toggleTaskDetails = (taskId) => {
     [taskId]: !prev[taskId]
   }));
 };
-
+const suggestPriority = (taskName, dueDate) => {
+  const today = new Date();
+  const taskDate = new Date(dueDate);
+  const daysDiff = Math.floor((taskDate - today) / (1000 * 60 * 60 * 24));
+  
+  if (taskName.toLowerCase().includes('urgent') || daysDiff <= 1) {
+    return 'high';
+  } else if (daysDiff <= 3) {
+    return 'medium';
+  }
+  return 'low';
+};
 
 const filterTasks = (tasks) => {
   // First filter by priority if selected
@@ -107,6 +161,8 @@ const calculateProgress = () => {
       const taskadder = () => {
         if (Text1.trim() === "" || Text2.trim() === "") {
             alert("Please Enter Both Task and Time if Notes");
+            setAlertType('error');
+            setShowAlert(true);
             return;
         }
             const newTask = { subject: Text1, time: Text2,date:selectedDate, notes: Text3,priority: priority  };
@@ -124,6 +180,9 @@ const calculateProgress = () => {
         setSelectedDate("");
         console.log(updatedTasks);
         setPriority("medium");
+        setAlertMessage("Task added successfully!");
+        setAlertType('success');
+        setShowAlert(true);
     };
     const taskadderwith = () => {
       if (Text1.trim() === "" || Text2.trim() === "") {
@@ -209,6 +268,16 @@ const calculateProgress = () => {
             setCompletedTips(JSON.parse(savedCompletedTips));
           }
         }, []);
+        useEffect(() => {
+          // Track user experience level based on completed tasks
+          const totalCompletedTasks = Taskcomplete.length;
+          if (totalCompletedTasks > 30) {
+            setUserExperience('advanced');
+            setShowAdvancedFeatures(true);
+          } else if (totalCompletedTasks > 10) {
+            setUserExperience('intermediate');
+          }
+        }, [Taskcomplete.length]);
        
          useEffect(() => {
            if (reminders.length === 0) return;
@@ -240,10 +309,39 @@ const calculateProgress = () => {
     
 return (
   <>
+        {showAlert && (
+        <TaskAlert 
+          message={alertMessage}
+          type={alertType}
+          onClose={() => setShowAlert(false)}
+        />
+      )}
+      
+
+   <Navbar completedTasksCount={Taskcomplete.length} />
+
+<div style={{
+      width: "100%",
+      height: "530px", // Adjust this value as needed
+      overflow: "hidden",
+      marginBottom: "20px"
+    }}>
+      <img 
+        src="task.png" 
+        alt="Task Management Banner"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center",
+          borderRadius: "0", // Remove border radius for full-width look
+       
+        }}
+      />
+    </div>
+    
     <br />
     <br />
-    
-    
     <div className="d-flex justify-content-center allign items-center ">
       <p
         style={{
@@ -289,6 +387,7 @@ return (
           backgroundColor: "#FAF3DD",
           border: "2px solid #D4A373",
           outline: "none",
+          borderRadius:"8px",
         }}
       ></input>
       <input
@@ -303,6 +402,7 @@ return (
           backgroundColor: "#FAF3DD",
           border: "2px solid #D4A373",
           outline: "none",
+          borderRadius:"8px",
         }}
       />
     </div>
@@ -318,19 +418,22 @@ return (
         Task Date :
       </div>
       <input
-        type="date"
-        value={selectedDate}
-        onChange={(e) => setSelectedDate(e.target.value)}
-        className="form-control-lg"
-        style={{
-          marginRight: "120px",
-          backgroundColor: "#FAF3DD",
-          border: "2px solid #D4A373",
-          outline: "none",
-          fontSize: "18px",
-          width: "50%",
-        }}
-      />
+  type="date"
+  value={selectedDate}
+  onChange={handleDateChange}
+  className="form-control-lg"
+  style={{
+    marginRight: "120px",
+    backgroundColor: "#FAF3DD",
+    border: "2px solid #D4A373",
+    outline: "none",
+    fontSize: "18px",
+    width: "50%",
+
+  }}
+/>
+
+
     </div>
     <br />
     <div className="d-flex justify-content-center allign items-center">
@@ -394,6 +497,24 @@ return (
       </select>
     </div>
     <br />
+    {userExperience === 'beginner' && (
+  <div className="helper-text text-center" style={{ 
+    color: "#4A6656", 
+    fontSize: "14px",
+    marginTop: "5px" 
+  }}>
+    Priority will be automatically suggested based on due date
+  </div>
+)}
+    
+{showAdvancedFeatures && (
+  <div className="d-flex justify-content-center">
+    <div style={{ width: "66%" }}>
+      <AdvancedFeatures />
+    </div>
+  </div>
+)}
+<br/>
 
     <div className="d-grid gap-2 col-6 mx-auto">
   <button
@@ -517,6 +638,10 @@ return (
   padding: "20px 20px",
   borderRadius: "25px",
   backgroundColor: "#A8D5BA",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  margin: "40px auto",
+  maxWidth: "90%"
+
 }}>
   <div className="d-flex justify-content-center mb-4">
     <button
@@ -599,7 +724,12 @@ return (
     <option value="low" style={{color: "#28a745"}}>Low Priority</option>
   </select>
 </div>
-      <div className="row">
+      <div className="row" style={{
+ backgroundColor: "#A8D5BA",
+ padding: "20px",
+ borderRadius: "12px",
+ boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)"
+}}>
       <div className="col-md-6 col-sm-6 col-12 text-center">
           <h3 style={{ color: "#5C4033", marginLeft: "10px" }}>
             Tasks
@@ -622,7 +752,15 @@ return (
               padding: "10px",
               margin: "10px 0",
               borderRadius: "8px",
-              border: "2px solid #D4A373"
+              border: "2px solid #D4A373",
+              boxShadow: "0 3px 6px rgba(0, 0, 0, 0.08)",
+    transition: "all 0.3s ease",
+    cursor: "pointer",
+    transform: expandedTasks[`task-${index}`] ? "scale(1.02)" : "scale(1)",
+    hover: {
+      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+      transform: "translateY(-2px)"
+    }
             }}>
               <div 
                 onClick={() => toggleTaskDetails(`task-${index}`)}
@@ -700,7 +838,15 @@ return (
               padding: "10px",
               margin: "10px 0",
               borderRadius: "8px",
-              border: "2px solid #D4A373"
+              border: "2px solid #D4A373",
+              boxShadow: "0 3px 6px rgba(0, 0, 0, 0.08)",
+              transition: "all 0.3s ease",
+    cursor: "pointer",
+    transform: expandedTasks[`taskwith-${index}`] ? "scale(1.02)" : "scale(1)",
+    hover: {
+      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+      transform: "translateY(-2px)"
+    }
             }}>
               <div 
                 onClick={() => toggleTaskDetails(`taskwith-${index}`)}
@@ -761,7 +907,12 @@ return (
            </>
     ):
       (
-        <div className="completed-tasks">
+        <div className="completed-tasks" style={{
+          backgroundColor: "#A8D5BA",
+          padding: "20px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)"
+        }}>
           <h3 style={{ color: "#5C4033", marginLeft: "10px" }}>
             Completed Tasks
           </h3>
@@ -781,7 +932,12 @@ return (
                 padding: "10px",
                 margin: "10px 0",
                 borderRadius: "8px",
-                border: "2px solid #D4A373"
+                border: "2px solid #D4A373",
+                boxShadow: "0 3px 6px rgba(0, 0, 0, 0.08)",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                cursor: "pointer",
+                transform: expandedTasks[`completed-${index}`] ? "scale(1.02)" : "scale(1)"
+              
               }}>
                 <div 
                   onClick={() => toggleTaskDetails(`completed-${index}`)}
@@ -834,8 +990,12 @@ return (
       </div>
       <br/>
       <br/> 
-      <div id=" progress-section" className=" progress-section mb-4" style={{ backgroundColor: "#FAF3DD", padding: "20px", borderRadius: "8px", border: "2px solid #D4A373" }}>
-        <div className="d-flex justify-content-between align-items-center mb-3">
+      
+
+
+      <div id="statistics-section" className=" progress-section mb-4" style={{ backgroundColor: "#FAF3DD", padding: "25px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", borderRadius: "8px", border: "2px solid #D4A373",margin: "40px auto",
+    maxWidth: "90%" }}>
+        <div className="statistics-section">
           <h4 style={{ color: "#4A6656", margin: 0 }}>Progress Tracking</h4>
           <button 
             className="btn btn-sm" 
@@ -851,7 +1011,7 @@ return (
         </div>
         
         {showProgress && (
-          <div className="progress-bars">
+          <div className="progress-bars"style={{ padding: "10px 0" }}>
             <div className="mb-2">
               <div className="d-flex justify-content-between mb-1">
                 <span style={{ color: "#4A6656" }}>Overall Progress</span>
@@ -915,7 +1075,8 @@ return (
       </div>
 
       {/* Weekly Summary Section */}
-      <div className="weekly-summary mb-4" style={{ backgroundColor: "#FAF3DD", padding: "20px", borderRadius: "8px", border: "2px solid #D4A373" }}>
+      <div className="weekly-summary mb-4" style={{ backgroundColor: "#FAF3DD", padding: "20px",boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+  margin: "40px auto", borderRadius: "8px", border: "2px solid #D4A373",maxWidth: "90%" }}>
         <div className="d-flex justify-content-between">
           <div className="stat-box text-center p-2" style={{ flex: 1 }}>
             <h5 style={{ color: "#4A6656" }}>Tasks Completed Today</h5>
@@ -938,6 +1099,75 @@ return (
           </div>
         </div>
       </div>
+      <div className="contact-section" style={{ 
+  backgroundColor: "#5C4033",
+  padding: "40px 0",
+  marginTop: "40px",
+  color: "#FAF3DD"
+}}>
+  <div className="container">
+    <div className="row justify-content-center">
+      <div className="col-md-8 text-center">
+        <h3 style={{ 
+          color: "#FAF3DD",
+          marginBottom: "30px",
+          fontWeight: "600"
+        }}>
+          Contact Us
+        </h3>
+        <div className="d-flex justify-content-center gap-4">
+          <a href="https://github.com/balajivejendla" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: "#FAF3DD",
+              fontSize: "24px",
+              transition: "color 0.3s"
+            }}
+            onMouseOver={(e) => e.target.style.color = "#77BFA3"}
+            onMouseOut={(e) => e.target.style.color = "#FAF3DD"}
+          >
+            <FaGithub />
+          </a>
+
+          <a href="https://mail.google.com/mail/u/0/" 
+            style={{ 
+              color: "#FAF3DD",
+              fontSize: "24px",
+              transition: "color 0.3s"
+            }}
+            onMouseOver={(e) => e.target.style.color = "#77BFA3"}
+            onMouseOut={(e) => e.target.style.color = "#FAF3DD"}
+          >
+            <FaEnvelope />
+          </a>
+          <a href="tel:+1234567890" 
+            style={{ 
+              color: "#FAF3DD",
+              fontSize: "24px",
+              transition: "color 0.3s"
+            }}
+            onMouseOver={(e) => e.target.style.color = "#77BFA3"}
+            onMouseOut={(e) => e.target.style.color = "#FAF3DD"}
+          >
+            <FaPhone />
+          </a>
+        </div>
+        <div className="contact-details mt-4" style={{ color: "#FAF3DD" }}>
+          <p>Email: balajivejendla@gmail.com</p>
+          <p>Phone: +91 9550903943</p>
+          <p>Location: Chennai, Tamil Nadu,India</p>
+        </div>
+        <div className="copyright mt-4" style={{ 
+          color: "#A8D5BA",
+          fontSize: "14px"
+        }}>
+          © {new Date().getFullYear()} Task Management System. All rights reserved.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
   </>
 );

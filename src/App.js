@@ -25,6 +25,8 @@ function App() {
 <Routes>
 <Route path='/' element={<div className="conatiner"><Tasks/></div>}/>
 
+     
+
 <Route path='/Features' element={<div className="container" ><Features/></div>}/>
 <Route path='/Contactus' element={<div className="container" ><Contact/></div>}/>
 <Route path='/Tips' element={<div className="container" ><Tip1/></div>}/>
