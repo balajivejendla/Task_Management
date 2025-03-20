@@ -117,3 +117,15 @@ textarea::placeholder {
     opacity: 1;
   }
 }
+.custom-nav-link {
+  color: #FAF3DD !important;
+  margin-right: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.custom-nav-link:hover {
+  background-color: #77BFA3;
+  color: #FAF3DD !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

@@ -2,10 +2,10 @@ import React, { useState ,useEffect} from 'react'
 import Navbar from './Navbar';
 import TaskAlert from './Alert';
 import { FaGithub, FaLinkedin, FaEnvelope, FaPhone } from 'react-icons/fa';
-
+import { FaArrowUp } from 'react-icons/fa';
 
 function Tasks(){
-
+      const [showBackToTop, setShowBackToTop] = useState(false);
       const[Text1,setText1]=useState('');
       const[Text2,setText2]=useState('');
       const[Text3,setText3]=useState('');
@@ -38,7 +38,24 @@ const handleDateChange = (e) => {
     setPriority(suggestedPriority);
   }
 };
+useEffect(() => {
+  const handleScroll = () => {
+    if (window.pageYOffset > 300) {
+      setShowBackToTop(true);
+    } else {
+      setShowBackToTop(false);
+    }
+  };
 
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+};
 
 const AdvancedFeatures = () => (
   <div className="advanced-features p-3" style={{ 
@@ -342,205 +359,241 @@ return (
     
     <br />
     <br />
-    <div className="d-flex justify-content-center allign items-center ">
-      <p
-        style={{
-          color: "#4A6656",
-          fontSize: "22px",
-          marginRight: "35px",
-          fontWeight: 600,
-        }}
-      >
-        Task Subject :
-      </p>
-      <input
-        className="form-control-lg w-50"
-        type="text"
-        placeholder="Enter the Task Name Here"
-        value={Text1}
-        onChange={handleonchange1}
-        style={{
-          color: "#5C4033",
-          backgroundColor: "#FAF3DD",
-          border: "2px solid #D4A373",
-          outline: "none",
-        }}
-      ></input>
-    </div>
-    <br />
-    <div className="d-flex justify-content-center allign items-center">
-      <div
-        className="small_screens"
-        style={{ color: "#4A6656", fontWeight: 600 }}
-      >
-        Task Deadline :
-      </div>
-      <input
-        readOnly
-        className="form-control-lg w-50"
-        type="text"
-        placeholder="Click on Clock Button to Enter Time"
-        value={Text2}
-        onChange={handleonchange2}
-        style={{
-          marginLeft: "30px",
-          backgroundColor: "#FAF3DD",
-          border: "2px solid #D4A373",
-          outline: "none",
-          borderRadius:"8px",
-        }}
-      ></input>
-      <input
-        type="time"
-        value={Text2}
-        onChange={(e) => {
-          setText2(e.target.value);
-        }}
-        style={{
-          fontSize: "22px",
-          marginLeft: "20px",
-          backgroundColor: "#FAF3DD",
-          border: "2px solid #D4A373",
-          outline: "none",
-          borderRadius:"8px",
-        }}
-      />
-    </div>
-    <br />
-    <div
-      className="d-flex justify-content-center allign items-center"
-      style={{ marginTop: "20px" }}
-    >
-      <div
-        className="small_screens"
-        style={{ marginRight: "70px", color: "#4A6656", fontWeight: 600 }}
-      >
-        Task Date :
-      </div>
-      <input
-  type="date"
-  value={selectedDate}
-  onChange={handleDateChange}
-  className="form-control-lg"
-  style={{
-    marginRight: "120px",
-    backgroundColor: "#FAF3DD",
-    border: "2px solid #D4A373",
-    outline: "none",
-    fontSize: "18px",
-    width: "50%",
-
-  }}
-/>
-
-
-    </div>
-    <br />
-    <div className="d-flex justify-content-center allign items-center">
-      <label
-        htmlFor="exampleFormControlTextarea1"
-        className="form-label"
-        style={{
-          fontSize: "22px",
-          marginRight: "95px",
-          color: "#4A6656",
-          fontWeight: 600,
-        }}
-      >
-        Notes :
-      </label>
-      <textarea
-        className="form-control-lg w-50"
-        id="exampleFormControlTextarea1"
-        placeholder="Enter the Notes Here"
-        rows="5"
-        value={Text3}
-        onChange={handleonchange3}
-        style={{
-          color: "#5C4033",
-          backgroundColor: "#FAF3DD",
-          border: "2px solid #D4A373",
-          outline: "none",
-          marginLeft: "5px",
-        }}
-      ></textarea>
-    </div>
-    <br />
-    <div className="d-flex justify-content-center align-items-center">
-      <label
-        className="form-label"
-        style={{
-          fontSize: "22px",
-          marginRight: "95px",
-          color: "#4A6656",
-          fontWeight: 600,
-        }}
-      >
-        Priority:
-      </label>
-      <select
-        className="form-control-lg"
-        value={priority}
-        onChange={(e) => setPriority(e.target.value)}
-        style={{
-          width: "50%",
-          backgroundColor: "#FAF3DD",
-          border: "2px solid #D4A373",
-          outline: "none",
-          color: "#5C4033",
-          marginLeft: "5px",
-        }}
-      >
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-      </select>
-    </div>
-    <br />
-    {userExperience === 'beginner' && (
-  <div className="helper-text text-center" style={{ 
-    color: "#4A6656", 
-    fontSize: "14px",
-    marginTop: "5px" 
-  }}>
-    Priority will be automatically suggested based on due date
-  </div>
-)}
     
-{showAdvancedFeatures && (
-  <div className="d-flex justify-content-center">
-    <div style={{ width: "66%" }}>
-      <AdvancedFeatures />
+<div className="container mt-4">
+  <div className="row">
+    {/* Left Column - Task Inputs */}
+    <div className="col-md-6 pe-4" style={{ borderRight: "2px solid #D4A373" }}>
+      <h3 style={{ color: "#4A6656", marginBottom: "30px" }}>Create New Task</h3>
+      
+      <div className="mb-4">
+        <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
+          Task Subject
+        </label>
+        <input
+          className="form-control"
+          type="text"
+          placeholder="Enter the Task Name Here"
+          value={Text1}
+          onChange={handleonchange1}
+          style={{
+            backgroundColor: "#FAF3DD",
+            border: "2px solid #D4A373",
+            outline: "none",
+            color: "#5C4033",
+          }}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
+          Task Deadline
+        </label>
+        <div className="d-flex gap-2">
+          <input
+            type="time"
+            value={Text2}
+            onChange={(e) => setText2(e.target.value)}
+            className="form-control"
+            style={{
+              backgroundColor: "#FAF3DD",
+              border: "2px solid #D4A373",
+              outline: "none",
+            }}
+          />
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={handleDateChange}
+            className="form-control"
+            style={{
+              backgroundColor: "#FAF3DD",
+              border: "2px solid #D4A373",
+              outline: "none",
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
+          Notes
+        </label>
+        <textarea
+          className="form-control"
+          rows="4"
+          placeholder="Enter the Notes Here"
+          value={Text3}
+          onChange={handleonchange3}
+          style={{
+            backgroundColor: "#FAF3DD",
+            border: "2px solid #D4A373",
+            outline: "none",
+            color: "#5C4033",
+          }}
+        />
+      </div>
+
+      <div className="mb-4">
+        <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
+          Priority
+        </label>
+        <select
+          className="form-control"
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          style={{
+            backgroundColor: "#FAF3DD",
+            border: "2px solid #D4A373",
+            outline: "none",
+            color: "#5C4033",
+          }}
+        >
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
+      <div className="d-grid gap-2">
+        <button
+          disabled={Text1.length === 0}
+          className="btn"
+          onClick={taskadder}
+          style={{ 
+            backgroundColor: "#77BFA3", 
+            color: "#ffffff",
+            padding: "10px"
+          }}
+        >
+          Add Task
+        </button>
+        <button
+          disabled={Text1.length === 0}
+          className="btn"
+          onClick={() => {
+            taskadderwith();
+            handleSetReminder();
+          }}
+          style={{ 
+            backgroundColor: "#ffffff",
+            color: "#77BFA3",
+            border: "2px solid #77BFA3"
+          }}
+        >
+          Add Task with Reminder
+        </button>
+      </div>
+    </div>
+
+    {/* Right Column - Task Overview */}
+    <div className="col-md-6">
+  <div style={{ 
+    backgroundColor: "#FAF3DD",
+    padding: "20px",
+    borderRadius: "8px",
+    border: "2px solid #D4A373",
+    marginBottom: "20px"
+  }}>
+    <h3 style={{ color: "#4A6656", marginBottom: "20px" }}>Today's Tasks</h3>
+    
+    <div className="today-tasks mb-4">
+      {Tasks.concat(Taskwith).filter(task => {
+        const today = new Date().toISOString().split('T')[0];
+        return task.date === today;
+      }).length === 0 ? (
+        <p style={{ color: "#4A6656", fontSize: "16px" }}>No tasks scheduled for today</p>
+      ) : (
+        Tasks.concat(Taskwith)
+          .filter(task => {
+            const today = new Date().toISOString().split('T')[0];
+            return task.date === today;
+          })
+          .sort((a, b) => new Date('1970/01/01 ' + a.time) - new Date('1970/01/01 ' + b.time))
+          .map((task, index) => (
+            <div key={index} className="task-summary-item" style={{
+              padding: "10px",
+              marginBottom: "10px",
+              borderLeft: `4px solid ${
+                task.priority === 'high' ? '#dc3545' : 
+                task.priority === 'medium' ? '#ffc107' : '#28a745'
+              }`,
+              backgroundColor: "#ffffff",
+              borderRadius: "4px"
+            }}>
+              <div className="d-flex justify-content-between align-items-center">
+                <span style={{ color: "#4A6656", fontWeight: "500" }}>
+                  {task.subject}
+                </span>
+                <span style={{ color: "#666", fontSize: "14px" }}>
+                  {task.time}
+                </span>
+              </div>
+            </div>
+          ))
+      )}
+    </div>
+
+    <div className="upcoming-deadlines mt-4">
+      <h5 style={{ color: "#4A6656", marginBottom: "15px" }}>Upcoming Deadlines</h5>
+      {Tasks.concat(Taskwith)
+        .filter(task => {
+          const today = new Date().toISOString().split('T')[0];
+          return task.date > today;
+        })
+        .slice(0, 3)
+        .map((task, index) => (
+          <div key={index} className="deadline-item" style={{
+            padding: "8px",
+            marginBottom: "8px",
+            backgroundColor: "#ffffff",
+            borderRadius: "4px",
+            fontSize: "14px"
+          }}>
+            <div className="d-flex justify-content-between">
+              <span style={{ color: "#4A6656" }}>{task.subject}</span>
+              <span style={{ color: "#666" }}>{task.date}</span>
+            </div>
+          </div>
+        ))}
     </div>
   </div>
-)}
-<br/>
+  <div style={{ 
+        backgroundColor: "#FAF3DD",
+        padding: "20px",
+        borderRadius: "8px",
+        border: "2px solid #D4A373"
+      }}>
+        <h3 style={{ color: "#4A6656", marginBottom: "20px" }}>Today's Overview</h3>
+        
+        <div className="mb-4">
+          <h5 style={{ color: "#4A6656" }}>Tasks Summary</h5>
+          <div className="d-flex justify-content-between mb-2">
+            <span>Total Active Tasks:</span>
+            <span style={{ color: "#77BFA3", fontWeight: "bold" }}>{totalActiveTasks}</span>
+          </div>
+          <div className="d-flex justify-content-between mb-2">
+            <span>Completed Today:</span>
+            <span style={{ color: "#77BFA3", fontWeight: "bold" }}>
+              {Taskcomplete.filter(task => {
+                const today = new Date().toISOString().split('T')[0];
+                return task.date === today;
+              }).length}
+            </span>
+          </div>
+          <div className="d-flex justify-content-between">
+            <span>Overall Progress:</span>
+            <span style={{ color: "#77BFA3", fontWeight: "bold" }}>
+              {Math.round(calculateProgress().overall)}%
+            </span>
+          </div>
+        </div>
 
-    <div className="d-grid gap-2 col-6 mx-auto">
-  <button
-    disabled={Text1.length === 0}
-    className="btn btn-success"
-    type="button"
-    onClick={taskadder}
-    style={{ color: "#ffffff", backgroundColor: "#77BFA3" }}
-  >
-    <span style={{ marginRight: "8px", fontSize: "20px" }}>+</span>
-    Add Task
-  </button>
-  <button
-    disabled={Text1.length === 0}
-    className="btn btn-success"
-    type="button"
-    onClick={() => {
-      taskadderwith();
-      handleSetReminder();
-    }}
-    style={{ color: "#77BFA3", backgroundColor: "#ffffff" }}
-  >
-    <span style={{ marginRight: "8px", fontSize: "20px" }}>+</span>
-    Add Task with Reminder{" "}
-    <img src="icon1.jpg" alt="icon" class="btn-icon"></img>
-  </button>
+        
+      </div>
+
+  </div>
+  </div>
 </div>
     
 
@@ -572,20 +625,7 @@ return (
         </button>
       </div>
 
-      {isOpen && (
-        <div className="tips-content mt-3">
-          {tips.map((tip, index) => (
-            <div 
-              key={index} 
-              className="tip-item d-flex align-items-center gap-2 mb-2"
-            >
-              <span style={{ color: "#4A6656" }}>
-                • {tip}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+
     </div>
     <div className="tips-section mb-4" 
   style={{ 
@@ -633,7 +673,7 @@ return (
 </div>
     
     
-    <div className="container" style={{
+    <div id="tasks-section" className="container" style={{
   border: "5px solid rgb(206, 169, 132)",
   padding: "20px 20px",
   borderRadius: "25px",
@@ -728,9 +768,9 @@ return (
  backgroundColor: "#A8D5BA",
  padding: "20px",
  borderRadius: "12px",
- boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)"
+ 
 }}>
-      <div className="col-md-6 col-sm-6 col-12 text-center">
+      <div className="col-md-6 col-sm-6 col-12 text-center" style={{padding:"20px",boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)"}}>
           <h3 style={{ color: "#5C4033", marginLeft: "10px" }}>
             Tasks
           </h3>
@@ -742,6 +782,7 @@ return (
                 fontWeight: "500",
                 marginLeft: "10px",
                 color: "#4A6656",
+                
               }}
             >
               No Tasks Added without Reminder
@@ -759,6 +800,7 @@ return (
     transform: expandedTasks[`task-${index}`] ? "scale(1.02)" : "scale(1)",
     hover: {
       boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+      
       transform: "translateY(-2px)"
     }
             }}>
@@ -816,7 +858,7 @@ return (
           )) }
         </div>
 
-        <div className="col-md-6 col-sm-6 col-12 text-center">
+        <div className="col-md-6 col-sm-6 col-12 text-center" style={{padding:"20px",boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)"}}>
           <h3 style={{ color: "#5C4033", marginLeft: "10px" }}>
             Tasks with Reminders
           </h3>
@@ -1168,7 +1210,41 @@ return (
     </div>
   </div>
 </div>
-
+{showBackToTop && (
+  <button
+    onClick={scrollToTop}
+    style={{
+      position: 'fixed',
+      bottom: '40px',
+      right: '40px',
+      width: '50px',
+      height: '50px',
+      backgroundColor: '#77BFA3',
+      color: '#FAF3DD',
+      border: 'none',
+      borderRadius: '50%',
+      fontSize: '24px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: 'pointer',
+      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+      transition: 'all 0.3s ease',
+      zIndex: 1000,
+    }}
+    onMouseOver={(e) => {
+      e.target.style.transform = 'scale(1.1)';
+      e.target.style.backgroundColor = '#4A6656';
+    }}
+    onMouseOut={(e) => {
+      e.target.style.transform = 'scale(1)';
+      e.target.style.backgroundColor = '#77BFA3';
+    }}
+    aria-label="Back to top"
+  >
+    <FaArrowUp />
+  </button>
+)}
   </>
 );
 }

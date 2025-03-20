@@ -16,6 +16,7 @@ export default function Tips() {
     <>
     <br/>
     <br/>
+    <br/>
     
     <div className="tips-section mb-4" 
       style={{ 
