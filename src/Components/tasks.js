@@ -17,6 +17,7 @@ function Tasks(){
       const [expandedTasks, setExpandedTasks] = useState({});
       const [activeTab, setActiveTab] = useState('active');
       const totalActiveTasks = Tasks.length + Taskwith.length;
+      
       const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('success');
@@ -28,6 +29,32 @@ const [priorityFilter, setPriorityFilter] = useState('all');
 const [userExperience, setUserExperience] = useState('beginner'); // beginner, intermediate, advanced
 const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
 const [autoSchedule, setAutoSchedule] = useState(false);
+const [showTypingAnimation, setShowTypingAnimation] = useState(true);
+const [showLearningTips, setShowLearningTips] = useState(false);
+const [specialOffer, setSpecialOffer] = useState({
+  active: true,
+  endsIn: 24 * 60 * 60, // 24 hours in seconds
+});
+
+const [productivityChallenge, setProductivityChallenge] = useState({
+  active: false,
+  targetTasks: 5,
+  timeLimit: 2 * 60 * 60, // 2 hours in seconds
+  completedTasks: 0,
+  timeRemaining: 2 * 60 * 60,
+});
+const learningTips = [
+  'Create smaller, manageable tasks instead of large ones',
+  'Use high priority for urgent and important tasks',
+  'Set specific deadlines for better time management',
+  'Review your completed tasks to track progress',
+  'Take breaks between tasks to maintain productivity',
+  'Update task status regularly to stay organized'
+];
+const todayCompletedTasks = Taskcomplete.filter(task => {
+  const today = new Date().toISOString().split('T')[0];
+  return task.date === today;
+}).length;
 const handleDateChange = (e) => {
   const date = e.target.value;
   setSelectedDate(date);
@@ -39,8 +66,29 @@ const handleDateChange = (e) => {
   }
 };
 useEffect(() => {
+  const timer = setInterval(() => {
+    // Update special offer countdown
+    if (specialOffer.active && specialOffer.endsIn > 0) {
+      setSpecialOffer(prev => ({
+        ...prev,
+        endsIn: prev.endsIn - 1
+      }));
+    }
+
+    // Update productivity challenge countdown
+    if (productivityChallenge.active && productivityChallenge.timeRemaining > 0) {
+      setProductivityChallenge(prev => ({
+        ...prev,
+        timeRemaining: prev.timeRemaining - 1
+      }));
+    }
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [specialOffer.active, productivityChallenge.active]);
+useEffect(() => {
   const handleScroll = () => {
-    if (window.pageYOffset > 300) {
+    if (window.pageYOffset > 1200) {
       setShowBackToTop(true);
     } else {
       setShowBackToTop(false);
@@ -99,6 +147,22 @@ const toggleTaskDetails = (taskId) => {
     [taskId]: !prev[taskId]
   }));
 };
+const formatTime = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
+const startProductivityChallenge = () => {
+  setProductivityChallenge({
+    active: true,
+    targetTasks: 5,
+    timeLimit: 2 * 60 * 60,
+    completedTasks: 0,
+    timeRemaining: 2 * 60 * 60,
+  });
+};
 const suggestPriority = (taskName, dueDate) => {
   const today = new Date();
   const taskDate = new Date(dueDate);
@@ -111,6 +175,22 @@ const suggestPriority = (taskName, dueDate) => {
   }
   return 'low';
 };
+const updateProductivityChallenge = () => {
+  if (productivityChallenge.active) {
+    setProductivityChallenge(prev => {
+      const newCompletedTasks = prev.completedTasks + 1;
+      if (newCompletedTasks >= prev.targetTasks) {
+        // Challenge completed!
+        setShowAlert(true);
+        setAlertMessage("🎉 Congratulations! You've completed the productivity challenge!");
+        setAlertType('success');
+        return { ...prev, active: false };
+      }
+      return { ...prev, completedTasks: newCompletedTasks };
+    });
+  }
+};
+
 
 const filterTasks = (tasks) => {
   // First filter by priority if selected
@@ -167,6 +247,7 @@ const calculateProgress = () => {
   const lowPriorityTotal = [...Tasks, ...Taskwith, ...Taskcomplete].filter(t => t.priority === 'low').length;
   const lowPriorityCompleted = Taskcomplete.filter(t => t.priority === 'low').length;
 
+  
   return {
     overall: totalTasks ? (completedTasks / totalTasks) * 100 : 0,
     high: highPriorityTotal ? (highPriorityCompleted / highPriorityTotal) * 100 : 0,
@@ -197,7 +278,9 @@ const calculateProgress = () => {
         setSelectedDate("");
         console.log(updatedTasks);
         setPriority("medium");
-        setAlertMessage("Task added successfully!");
+        setAlertMessage(`Task added successfully! ${todayCompletedTasks > 0 
+          ? `You've completed ${todayCompletedTasks} ${todayCompletedTasks === 1 ? 'task' : 'tasks'} today! Keep up the great work! 🎉 ⭐` 
+          : 'Keep going! 💪'}`);
         setAlertType('success');
         setShowAlert(true);
     };
@@ -240,6 +323,7 @@ const calculateProgress = () => {
         setTasks(Tasks.filter((_, i) => i !== index));
         setTaskcomplete([...Taskcomplete,completed_task]);
         console.log(Taskcomplete)
+        updateProductivityChallenge();
         
        }
        const RemoveReminder=(index)=>{
@@ -248,6 +332,7 @@ const calculateProgress = () => {
         const task_completed=Taskwith[index];
         setTaskwith(Taskwith.filter((_, i) => i !==index));
         setTaskcomplete([...Taskcomplete,task_completed]);
+        updateProductivityChallenge();
        }
 
 
@@ -326,6 +411,126 @@ const calculateProgress = () => {
     
 return (
   <>
+  {showBackToTop && (
+  <div style={{
+    position: 'fixed',
+    bottom: '90px',
+    right: '28px',
+    zIndex: 1000
+  }}>
+    <button
+      onClick={scrollToTop}
+      style={{
+        backgroundColor: '#77BFA3',
+        color: '#FAF3DD',
+        border: 'none',
+        borderRadius: '50%',
+        width: '45px',
+        height: '45px',
+        fontSize: '20px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+      onMouseOver={(e) => {
+        e.target.style.transform = 'scale(1.1)';
+        e.target.style.backgroundColor = '#4A6656';
+      }}
+      onMouseOut={(e) => {
+        e.target.style.transform = 'scale(1)';
+        e.target.style.backgroundColor = '#77BFA3';
+      }}
+    >
+      <FaArrowUp />
+    </button>
+  </div>
+)}
+
+  <div style={{
+  position: 'fixed',
+  bottom: '20px',
+  right: '20px',
+  zIndex: 1000
+}}>
+  <button
+    onClick={() => setShowLearningTips(!showLearningTips)}
+    style={{
+      backgroundColor: '#77BFA3',
+      color: '#FAF3DD',
+      border: 'none',
+      borderRadius: '50%',
+      width: '60px',
+      height: '60px',
+      fontSize: '24px',
+      boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}
+    onMouseOver={(e) => {
+      e.target.style.transform = 'scale(1.1)';
+      e.target.style.backgroundColor = '#4A6656';
+    }}
+    onMouseOut={(e) => {
+      e.target.style.transform = 'scale(1)';
+      e.target.style.backgroundColor = '#77BFA3';
+    }}
+  >
+    💡
+  </button>
+
+  {/* Learning Tips Popup */}
+  {showLearningTips && (
+    <div style={{
+      position: 'fixed',
+      bottom: '90px',
+      right: '20px',
+      width: '300px',
+      backgroundColor: '#FAF3DD',
+      borderRadius: '8px',
+      border: '2px solid #D4A373',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      padding: '20px',
+      zIndex: 1000
+    }}>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 style={{ color: '#4A6656', margin: 0 }}>Learning Tips</h5>
+        <button
+          onClick={() => setShowLearningTips(false)}
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#4A6656',
+            fontSize: '20px',
+            cursor: 'pointer'
+          }}
+        >
+          ×
+        </button>
+      </div>
+      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+        {learningTips.map((tip, index) => (
+          <div
+            key={index}
+            style={{
+              padding: '8px 0',
+              borderBottom: index < learningTips.length - 1 ? '1px solid #D4A373' : 'none',
+              color: '#5C4033'
+            }}
+          >
+            {tip}
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
         {showAlert && (
         <TaskAlert 
           message={alertMessage}
@@ -337,27 +542,107 @@ return (
 
    <Navbar completedTasksCount={Taskcomplete.length} />
 
-<div style={{
+   <div style={{
+  width: "100%",
+  height: "100vh",
+  overflow: "hidden",
+  marginTop: "-80px",
+  position: "relative"
+}}>
+  <img 
+    src="task.png" 
+    alt="Task Management Banner"
+    style={{
       width: "100%",
-      height: "530px", // Adjust this value as needed
-      overflow: "hidden",
+      height: "100%",
+      objectFit: "cover",
+      objectPosition: "center",
+      borderRadius: "0",
+      position: "relative",
+      zIndex: "0"
+    }}
+  />
+  <div style={{
+    position: "absolute",
+    bottom:"50px",
+    left: "50%",
+    transform: "translate(-50%)",
+    textAlign: "center",
+    color: "#FAF3DD",
+    zIndex: "1",
+    width: "100%",
+    padding: "0 20px"
+    
+  }}>
+    <h1 style={{
+      fontSize: "4rem",
+      fontWeight: "bold",
+      textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
       marginBottom: "20px"
     }}>
-      <img 
-        src="task.png" 
-        alt="Task Management Banner"
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: "center",
-          borderRadius: "0", // Remove border radius for full-width look
-       
-        }}
-      />
-    </div>
+      Welcome to TaskFlow Pro
+    </h1>
+    <p style={{
+      fontSize: "1.5rem",
+      maxWidth: "800px",
+      margin: "0 auto",
+      textShadow: "1px 1px 2px rgba(0,0,0,0.5)"
+    }}>
+      Organize, Track, and Complete Your Tasks with Ease
+    </p>
+    <button 
+  onClick={() => {
+    const element = document.getElementById('tasks-section');
+    const offset = 950; 
+    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo({
+      top: elementPosition - offset,
+      behavior: 'smooth'
+    });
+  }}      style={{
+        backgroundColor: "#77BFA3",
+        color: "#FAF3DD",
+        border: "none",
+        padding: "12px 30px",
+        borderRadius: "25px",
+        fontSize: "1.1rem",
+        marginTop: "30px",
+        cursor: "pointer",
+        transition: "all 0.3s ease",
+        boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+      }}
+      onMouseOver={(e) => {
+        e.target.style.backgroundColor = "#4A6656";
+        e.target.style.transform = "translateY(-2px)";
+      }}
+      onMouseOut={(e) => {
+        e.target.style.backgroundColor = "#77BFA3";
+        e.target.style.transform = "translateY(0)";
+      }}
+    >
+      Get Started
+    </button>
+  </div>
+</div>
     
     <br />
+    <div style={{
+  display: "flex",
+  justifyContent: "center",
+  margin: "40px 0"
+}}>
+  <h2 className="typing-text" style={{
+    color: "#4A6656",
+    fontSize: "3rem",
+    fontWeight: "bold",
+    position: "relative",
+    width: "fit-content",
+    margin: "0 auto",
+    fontFamily: "'Dancing Script', cursive"
+  }}>
+    Add Task
+  </h2>
+</div>
     <br />
     
 <div className="container mt-4">
@@ -599,79 +884,123 @@ return (
 
     <br />
 
-    <div className="tips-section mb-4" 
-      style={{ 
-        backgroundColor: "#FAF3DD", 
-        padding: "15px", 
-        borderRadius: "8px", 
-        border: "2px solid #D4A373",
-        maxWidth: "800px",
-        margin: "0 auto 20px auto"
-      }}>
-      <div className="d-flex justify-content-between align-items-center">
-        <h5 style={{ color: "#4A6656", margin: 0 }}>
-          Quick Tips 💡
-        </h5>
-        <button 
-          className="btn btn-sm"
-          onClick={() => setIsOpen(!isOpen)}
-          style={{
-            color: "#4A6656",
-            border: "none",
-            backgroundColor: "transparent"
-          }}
-        >
-          {isOpen ? '▼' : '▶'}
-        </button>
-      </div>
 
 
-    </div>
-    <div className="tips-section mb-4" 
-  style={{ 
-    display: showTips ? 'block' : 'none',
-    backgroundColor: "#FAF3DD", 
-    padding: "15px", 
-    borderRadius: "8px", 
-    border: "2px solid #D4A373",
-    maxWidth: "800px",
-    margin: "0 auto 20px auto" // This centers the tips section
+<div className="special-offers mb-4" style={{
+  backgroundColor: "#FAF3DD",
+  padding: "20px",
+  borderRadius: "8px",
+  border: "2px solid #D4A373",
+  margin: "20px auto",
+  maxWidth: "90%"
+}}>
+  <h3 style={{ 
+    color: "#4A6656", 
+    textAlign: "center", 
+    marginBottom: "25px",
+    fontSize: "2rem",
+    fontWeight: "600",
+    borderBottom: "2px solid #D4A373",
+    paddingBottom: "10px"
   }}>
-  <div className="d-flex justify-content-between align-items-center">
-    <h5 style={{ color: "#4A6656", margin: 0 }}>Quick Tips 💡</h5>
-    <button 
-      onClick={() => {
-        setShowTips(false);
-        localStorage.setItem('hideTaskTips', 'true');
-      }}
-      className="btn-close"
-    />
-  </div>
-  <div className="tips-content mt-3">
-    {[
-      'Click ✅ to mark tasks as complete',
-      'Use priorities to organize tasks',
-      'Set reminders for important deadlines',
-    ].map((tip, index) => (
-      <div key={index} className="tip-item d-flex align-items-center gap-2 mb-2">
-        <input 
-          type="checkbox"
-          checked={completedTips.includes(index)}
-          onChange={() => {
-            const newCompletedTips = completedTips.includes(index) 
-              ? completedTips.filter(t => t !== index)
-              : [...completedTips, index];
-            setCompletedTips(newCompletedTips);
-            localStorage.setItem('completedTips', JSON.stringify(newCompletedTips));
-          }}
-          style={{ accentColor: "#77BFA3" }}
-        />
-        <span style={{ color: "#4A6656" }}>{tip}</span>
+    Special Offers & Challenges
+  </h3>
+  {specialOffer.active && specialOffer.endsIn > 0 && (
+    <div className="offer-card" style={{
+      backgroundColor: "#77BFA3",
+      padding: "15px",
+      borderRadius: "8px",
+      color: "#FAF3DD",
+      marginBottom: "15px",
+      position: "relative",
+      overflow: "hidden"
+    }}>
+               <div className="ribbon" style={{
+            position: "absolute",
+            top: "50px",
+            right: "10px",
+            transform: "rotate(45deg)",
+            backgroundColor: "#FFD700",
+            padding: "5px 40px",
+            color: "#4A6656",
+            fontWeight: "bold",
+            fontSize: "0.9rem"
+          }}>
+            Limited Time!
+          </div>
+      <div className="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 style={{ margin: 0 }}>🌟 Special Offer!</h5>
+          <p style={{ margin: "5px 0" }}>Upgrade to Pro – 50% off</p>
+        </div>
+        <div className="text-end">
+          <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
+            {formatTime(specialOffer.endsIn)}
+          </div>
+          <small>remaining</small>
+        </div>
       </div>
-    ))}
-  </div>
+      <button
+        className="btn"
+        style={{
+          backgroundColor: "#FAF3DD",
+          color: "#4A6656",
+          marginTop: "10px",
+          width: "100%"
+        }}
+        onClick={() => {/* Handle upgrade */}}
+      >
+        Upgrade Now
+      </button>
+    </div>
+  )}
+
+  {productivityChallenge.active ? (
+    <div className="challenge-card" style={{
+      backgroundColor: "#4A6656",
+      padding: "15px",
+      borderRadius: "8px",
+      color: "#FAF3DD"
+    }}>
+      <h5>🏃‍♂️ Productivity Challenge</h5>
+      <div className="d-flex justify-content-between align-items-center">
+        <div>
+          <p style={{ margin: "5px 0" }}>
+            Complete {productivityChallenge.targetTasks} tasks in 2 hours
+          </p>
+          <div className="progress" style={{ height: "20px", backgroundColor: "#FAF3DD" }}>
+            <div
+              className="progress-bar"
+              style={{
+                width: `${(productivityChallenge.completedTasks / productivityChallenge.targetTasks) * 100}%`,
+                backgroundColor: "#77BFA3"
+              }}
+            />
+          </div>
+          <small>{productivityChallenge.completedTasks} / {productivityChallenge.targetTasks} tasks</small>
+        </div>
+        <div className="text-end">
+          <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
+            {formatTime(productivityChallenge.timeRemaining)}
+          </div>
+          <small>remaining</small>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <button
+      className="btn"
+      style={{
+        backgroundColor: "#77BFA3",
+        color: "#FAF3DD",
+        width: "100%"
+      }}
+      onClick={startProductivityChallenge}
+    >
+      Start Productivity Challenge
+    </button>
+  )}
 </div>
-    
     
     <div id="tasks-section" className="container" style={{
   border: "5px solid rgb(206, 169, 132)",
@@ -1141,6 +1470,135 @@ return (
           </div>
         </div>
       </div>
+
+      <div className="testimonials-section mb-4" style={{ 
+  backgroundColor: "#FAF3DD", 
+  padding: "40px 20px",
+  borderRadius: "8px",
+  border: "2px solid #D4A373",
+  margin: "40px auto",
+  maxWidth: "90%"
+}}>
+  <h3 style={{ 
+    color: "#4A6656", 
+    textAlign: "center", 
+    marginBottom: "30px",
+    fontSize: "2rem",
+    fontWeight: "600"
+  }}>
+    What Our Users Say
+  </h3>
+  
+  <div className="row justify-content-center">
+    <div className="col-md-4 mb-4">
+      <div style={{
+        backgroundColor: "white",
+        padding: "20px",
+        borderRadius: "8px",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        height: "100%",
+        transition: "transform 0.3s ease",
+        cursor: "default"
+      }}
+      onMouseOver={(e) => e.target.style.transform = "translateY(-5px)"}
+      onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
+      >
+        <div className="text-center mb-3">
+          <img 
+            src="https://randomuser.me/api/portraits/women/32.jpg"
+            alt="Sarah Johnson"
+            style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "50%",
+              border: "3px solid #77BFA3",
+              marginBottom: "10px"
+            }}
+          />
+        </div>
+        <div style={{ color: "#FFD700", marginBottom: "10px", textAlign: "center" }}>★★★★★</div>
+        <p style={{ color: "#5C4033", fontSize: "1.1rem", marginBottom: "15px" }}>
+          "This task management system has revolutionized how I organize my work. The priority system is incredibly helpful!"
+        </p>
+        <div style={{ color: "#4A6656", fontWeight: "600", textAlign: "center" }}>Sarah Johnson</div>
+        <div style={{ color: "#77BFA3", fontSize: "0.9rem", textAlign: "center" }}>Project Manager</div>
+      </div>
+    </div>
+
+    <div className="col-md-4 mb-4">
+      <div style={{
+        backgroundColor: "white",
+        padding: "20px",
+        borderRadius: "8px",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        height: "100%",
+        transition: "transform 0.3s ease",
+        cursor: "default"
+      }}
+      onMouseOver={(e) => e.target.style.transform = "translateY(-5px)"}
+      onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
+      >
+        <div className="text-center mb-3">
+          <img 
+            src="https://randomuser.me/api/portraits/men/45.jpg"
+            alt="Michael Chen"
+            style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "50%",
+              border: "3px solid #77BFA3",
+              marginBottom: "10px"
+            }}
+          />
+        </div>
+        <div style={{ color: "#FFD700", marginBottom: "10px", textAlign: "center" }}>★★★★★</div>
+        <p style={{ color: "#5C4033", fontSize: "1.1rem", marginBottom: "15px" }}>
+          "The reminder feature ensures I never miss deadlines. Best task management tool I've used!"
+        </p>
+        <div style={{ color: "#4A6656", fontWeight: "600", textAlign: "center" }}>Michael Chen</div>
+        <div style={{ color: "#77BFA3", fontSize: "0.9rem", textAlign: "center" }}>Software Developer</div>
+      </div>
+    </div>
+
+    <div className="col-md-4 mb-4">
+      <div style={{
+        backgroundColor: "white",
+        padding: "20px",
+        borderRadius: "8px",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        height: "100%",
+        transition: "transform 0.3s ease",
+        cursor: "default"
+      }}
+      onMouseOver={(e) => e.target.style.transform = "translateY(-5px)"}
+      onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
+      >
+        <div className="text-center mb-3">
+          <img 
+            src="https://randomuser.me/api/portraits/women/68.jpg"
+            alt="Emily Rodriguez"
+            style={{
+              width: "80px",
+              height: "80px",
+              borderRadius: "50%",
+              border: "3px solid #77BFA3",
+              marginBottom: "10px"
+            }}
+          />
+        </div>
+        <div style={{ color: "#FFD700", marginBottom: "10px", textAlign: "center" }}>★★★★★</div>
+        <p style={{ color: "#5C4033", fontSize: "1.1rem", marginBottom: "15px" }}>
+          "Clean interface and intuitive design. The progress tracking keeps me motivated!"
+        </p>
+        <div style={{ color: "#4A6656", fontWeight: "600", textAlign: "center" }}>Emily Rodriguez</div>
+        <div style={{ color: "#77BFA3", fontSize: "0.9rem", textAlign: "center" }}>Freelance Designer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      
       <div className="contact-section" style={{ 
   backgroundColor: "#5C4033",
   padding: "40px 0",
@@ -1150,101 +1608,150 @@ return (
   <div className="container">
     <div className="row justify-content-center">
       <div className="col-md-8 text-center">
-        <h3 style={{ 
-          color: "#FAF3DD",
-          marginBottom: "30px",
-          fontWeight: "600"
-        }}>
-          Contact Us
-        </h3>
-        <div className="d-flex justify-content-center gap-4">
+        <div className="animated-heading" style={{ marginBottom: "30px" }}>
+          {"Contact Us".split('').map((letter, index) => (
+            <span
+              key={index}
+              className="animated-letter"
+              style={{
+                display: "inline-block",
+                animation: `fadeInUp 0.5s ease forwards`,
+                animationDelay: `${index * 0.1}s`,
+                opacity: 0,
+                transform: 'translateY(20px)',
+                margin: '0 2px',
+                fontSize: '2rem',
+                fontWeight: '600',
+                cursor: 'default'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.color = "#77BFA3";
+                e.target.style.transform = "translateY(-5px)";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.color = "#FAF3DD";
+                e.target.style.transform = "translateY(0)";
+              }}
+            >
+              {letter}
+            </span>
+          ))}
+        </div>
+
+        <div className="contact-icons d-flex justify-content-center gap-4 mb-4">
           <a href="https://github.com/balajivejendla" 
             target="_blank" 
             rel="noopener noreferrer"
+            className="contact-icon"
             style={{ 
               color: "#FAF3DD",
               fontSize: "24px",
-              transition: "color 0.3s"
+              transition: "all 0.3s ease",
+              padding: "10px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(255, 255, 255, 0.1)"
             }}
-            onMouseOver={(e) => e.target.style.color = "#77BFA3"}
-            onMouseOut={(e) => e.target.style.color = "#FAF3DD"}
+            onMouseOver={(e) => {
+              e.target.style.color = "#77BFA3";
+              e.target.style.transform = "translateY(-5px)";
+              e.target.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.color = "#FAF3DD";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+            }}
           >
             <FaGithub />
           </a>
 
-          <a href="https://mail.google.com/mail/u/0/" 
+          <a href="mailto:balajivejendla@gmail.com"
+            className="contact-icon"
             style={{ 
               color: "#FAF3DD",
               fontSize: "24px",
-              transition: "color 0.3s"
+              transition: "all 0.3s ease",
+              padding: "10px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(255, 255, 255, 0.1)"
             }}
-            onMouseOver={(e) => e.target.style.color = "#77BFA3"}
-            onMouseOut={(e) => e.target.style.color = "#FAF3DD"}
+            onMouseOver={(e) => {
+              e.target.style.color = "#77BFA3";
+              e.target.style.transform = "translateY(-5px)";
+              e.target.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.color = "#FAF3DD";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+            }}
           >
             <FaEnvelope />
           </a>
-          <a href="tel:+1234567890" 
+
+          <a href="tel:+919550903943"
+            className="contact-icon"
             style={{ 
               color: "#FAF3DD",
               fontSize: "24px",
-              transition: "color 0.3s"
+              transition: "all 0.3s ease",
+              padding: "10px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(255, 255, 255, 0.1)"
             }}
-            onMouseOver={(e) => e.target.style.color = "#77BFA3"}
-            onMouseOut={(e) => e.target.style.color = "#FAF3DD"}
+            onMouseOver={(e) => {
+              e.target.style.color = "#77BFA3";
+              e.target.style.transform = "translateY(-5px)";
+              e.target.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.color = "#FAF3DD";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+            }}
           >
             <FaPhone />
           </a>
         </div>
-        <div className="contact-details mt-4" style={{ color: "#FAF3DD" }}>
-          <p>Email: balajivejendla@gmail.com</p>
-          <p>Phone: +91 9550903943</p>
-          <p>Location: Chennai, Tamil Nadu,India</p>
+
+        <div className="contact-details" 
+          style={{ 
+            color: "#FAF3DD",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            padding: "20px",
+            borderRadius: "10px",
+            marginBottom: "20px"
+          }}>
+          <p className="mb-2" style={{ transition: "all 0.3s ease" }}
+             onMouseOver={(e) => e.target.style.color = "#77BFA3"}
+             onMouseOut={(e) => e.target.style.color = "#FAF3DD"}>
+            Email: balajivejendla@gmail.com
+          </p>
+          <p className="mb-2" style={{ transition: "all 0.3s ease" }}
+             onMouseOver={(e) => e.target.style.color = "#77BFA3"}
+             onMouseOut={(e) => e.target.style.color = "#FAF3DD"}>
+            Phone: +91 9550903943
+          </p>
+          <p className="mb-0" style={{ transition: "all 0.3s ease" }}
+             onMouseOver={(e) => e.target.style.color = "#77BFA3"}
+             onMouseOut={(e) => e.target.style.color = "#FAF3DD"}>
+            Location: Chennai, Tamil Nadu, India
+          </p>
         </div>
+
         <div className="copyright mt-4" style={{ 
           color: "#A8D5BA",
-          fontSize: "14px"
-        }}>
+          fontSize: "14px",
+          transition: "all 0.3s ease"
+        }}
+        onMouseOver={(e) => e.target.style.opacity = "0.8"}
+        onMouseOut={(e) => e.target.style.opacity = "1"}>
           © {new Date().getFullYear()} Task Management System. All rights reserved.
         </div>
       </div>
     </div>
   </div>
 </div>
-{showBackToTop && (
-  <button
-    onClick={scrollToTop}
-    style={{
-      position: 'fixed',
-      bottom: '40px',
-      right: '40px',
-      width: '50px',
-      height: '50px',
-      backgroundColor: '#77BFA3',
-      color: '#FAF3DD',
-      border: 'none',
-      borderRadius: '50%',
-      fontSize: '24px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'pointer',
-      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
-      transition: 'all 0.3s ease',
-      zIndex: 1000,
-    }}
-    onMouseOver={(e) => {
-      e.target.style.transform = 'scale(1.1)';
-      e.target.style.backgroundColor = '#4A6656';
-    }}
-    onMouseOut={(e) => {
-      e.target.style.transform = 'scale(1)';
-      e.target.style.backgroundColor = '#77BFA3';
-    }}
-    aria-label="Back to top"
-  >
-    <FaArrowUp />
-  </button>
-)}
   </>
 );
 }

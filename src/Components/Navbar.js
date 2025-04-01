@@ -1,15 +1,54 @@
-import React, { Component } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
 
 import { FaCheckCircle } from "react-icons/fa";
+import { useLoading } from '../Components/LoadingContext';
 
+import LoadingOverlay from './LoadingOverlay';
 function Navbar({ completedTasksCount }) {
+  const { isLoading, setIsLoading, loadingType, setLoadingType } = useLoading();
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation(); // Get current location
+  const navigate = useNavigate();
+  const isHomePage = location.pathname === "/"; // Check if we're on home page
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    if (isHomePage) {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [isHomePage]);
+  const handleNavigation = async (path, type) => {
+    console.log('Navigation type:', type); // Add this for debugging
+    setLoadingType(type); // Set this first
+    setIsLoading(true);
+    navigate(path);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+  };
+
   return (
     <>
       <nav
         className="navbar navbar-expand-lg fixed-top"
-        style={{ backgroundColor: "#4A6656" }}
+        style={{
+          backgroundColor: isHomePage
+            ? isScrolled
+              ? "#4A6656"
+              : "transparent"
+            : "#4A6656",
+          transition: "all 0.3s ease-in-out",
+          backdropFilter: isScrolled ? "blur(0px)" : "none",
+          boxShadow: isScrolled ? "0 2px 10px rgba(0,0,0,0.1)" : "none",
+        }}
       >
         <div className="container-fluid">
           <div
@@ -45,42 +84,56 @@ function Navbar({ completedTasksCount }) {
                   className="nav-link active custom-nav-link"
                   aria-current="page"
                   to="/"
-                  style={{ color: "#FAF3DD"
-         
-                   }}
+                  style={{ color: "#FAF3DD" }}
                 >
                   Home
                 </RouterLink>
               </li>
               <li className="nav-item">
-                <RouterLink
+                <button
                   className="nav-link custom-nav-link"
-                  to="/Features"
-                  style={{ color: "#FAF3DD",
-                    
-                   }}
+                  onClick={() => handleNavigation("/Features", "features")}
+
+                  style={{
+                    color: "#FAF3DD",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                 >
                   Features
-                </RouterLink>
+                </button>
               </li>
               <li className="nav-item custom-nav-link">
-                <RouterLink
+                <button
                   className="nav-link"
-                  to="/Contactus"
-                  style={{ color: "#FAF3DD" }}
+                  onClick={() => handleNavigation("/Contactus", "contact")}
+
+                  style={{
+                    color: "#FAF3DD",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                 >
                   Contact Us
-                </RouterLink>
+                </button>
               </li>
 
               <li className="nav-item custom-nav-link">
-                <RouterLink
+                <button
                   className="nav-link"
-                  to="/Tips"
-                  style={{ color: "#FAF3DD" }}
+                  onClick={() => handleNavigation("/Tips", "tips")}
+
+                  style={{
+                    color: "#FAF3DD",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                 >
                   Learning Tips
-                </RouterLink>
+                </button>
               </li>
             </ul>
             <div className="nav-item custom-nav-link">
@@ -150,15 +203,36 @@ function Navbar({ completedTasksCount }) {
               </div>
             </div>
 
-            <span
-              className="navbar-text custom-brand1"
-              style={{ color: "#FAF3DD" }}
+            <button
+              onClick={() => handleNavigation("/signin", "signin")}
+              className="btn"
+              style={{
+                backgroundColor: "#77BFA3",
+                color: "#FAF3DD",
+                border: "none",
+                borderRadius: "20px",
+                padding: "8px 20px",
+                textDecoration: "none",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "all 0.3s ease",
+                marginLeft: "10px",
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = "#4A6656";
+                e.target.style.transform = "scale(1.05)";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = "#77BFA3";
+                e.target.style.transform = "scale(1)";
+              }}
             >
-              Helps to do Tasks Easier
-            </span>
+              Sign In
+            </button>
           </div>
         </div>
       </nav>
+  {isLoading && <LoadingOverlay type={loadingType} />}
       <br />
     </>
   );

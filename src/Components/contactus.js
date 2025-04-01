@@ -1,13 +1,36 @@
-import React from 'react'
+import React, { useEffect } from 'react';
 
 function Contact() {
+    useEffect(() => {
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, observerOptions);
+
+        const fadeElements = document.querySelectorAll('.fade-in-section');
+        fadeElements.forEach(element => observer.observe(element));
+
+        return () => {
+            fadeElements.forEach(element => observer.unobserve(element));
+        };
+    }, []);
+
+
     return (
         <>
             <br/>
             <br/>
             <br/>
             <div className="accordion" id="accordionExample">
-                <div className="accordion-item">
+                <div className="fade-in-section">
                     <h2 className="accordion-header">
                         <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style={{backgroundColor:"#99bf9c"}}>
                             <strong>Email Support</strong>
@@ -24,7 +47,7 @@ function Contact() {
                     </div>
                 </div>
 
-                <div className="accordion-item">
+                <div className="fade-in-section delay-100">
                     <h2 className="accordion-header">
                         <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style={{backgroundColor:"#99bf9c"}}>
                             <strong>Phone Support</strong>
@@ -41,7 +64,7 @@ function Contact() {
                     </div>
                 </div>
 
-                <div className="accordion-item">
+                <div className="fade-in-section delay-200">
                     <h2 className="accordion-header">
                         <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" style={{backgroundColor:"#99bf9c"}}>
                             <strong>Office Location</strong>
@@ -59,52 +82,54 @@ function Contact() {
                 </div>
 
                 <br/><br/>
-                <div className="mb-3">
-                    <label htmlFor="contactForm" className="form-label">Send us a Message:</label>
+                <div className="fade-in-section delay-300">
                     <div className="mb-3">
-                        <input 
-                            type="text" 
-                            className="form-control" 
-                            placeholder="Your Name"
+                        <label htmlFor="contactForm" className="form-label">Send us a Message:</label>
+                        <div className="mb-3">
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                placeholder="Your Name"
+                                style={{
+                                    backgroundColor:"#FAF3DD",
+                                    border:"2px solid #D4A373",
+                                    marginBottom: "10px"
+                                }}
+                            />
+                            <input 
+                                type="email" 
+                                className="form-control" 
+                                placeholder="Your Email"
+                                style={{
+                                    backgroundColor:"#FAF3DD",
+                                    border:"2px solid #D4A373",
+                                    marginBottom: "10px"
+                                }}
+                            />
+                            <textarea 
+                                className="form-control" 
+                                id="contactForm" 
+                                style={{
+                                    borderBlock:"5px solid black",
+                                    backgroundColor:"#FAF3DD",
+                                    border:"2px solid #D4A373"
+                                }}
+                                rows="3"
+                                placeholder="Your Message"
+                            ></textarea>
+                        </div>
+                        <br/>
+                        <button 
+                            type="button" 
+                            className="btn btn-success"
                             style={{
-                                backgroundColor:"#FAF3DD",
-                                border:"2px solid #D4A373",
-                                marginBottom: "10px"
+                                backgroundColor:"#77BFA3",
+                                border: "none"
                             }}
-                        />
-                        <input 
-                            type="email" 
-                            className="form-control" 
-                            placeholder="Your Email"
-                            style={{
-                                backgroundColor:"#FAF3DD",
-                                border:"2px solid #D4A373",
-                                marginBottom: "10px"
-                            }}
-                        />
-                        <textarea 
-                            className="form-control" 
-                            id="contactForm" 
-                            style={{
-                                borderBlock:"5px solid black",
-                                backgroundColor:"#FAF3DD",
-                                border:"2px solid #D4A373"
-                            }}
-                            rows="3"
-                            placeholder="Your Message"
-                        ></textarea>
+                        >
+                            Send Message
+                        </button>
                     </div>
-                    <br/>
-                    <button 
-                        type="button" 
-                        className="btn btn-success"
-                        style={{
-                            backgroundColor:"#77BFA3",
-                            border: "none"
-                        }}
-                    >
-                        Send Message
-                    </button>
                 </div>
             </div>
         </>
