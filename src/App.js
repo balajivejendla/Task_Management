@@ -12,13 +12,14 @@ import Contact from './Components/contactus';
 
 import Tip1 from './Components/Tips';
 import Signin from './Components/Signin';
-
+import { AuthProvider } from './Components/AuthContext';
 import { LoadingProvider } from './Components/LoadingContext';
 import { useLoading } from './Components/LoadingContext';
 
 function App() {
 
   return (
+    <AuthProvider>
     <LoadingProvider>
     <>
     
@@ -54,6 +55,7 @@ function App() {
 
     </>
     </LoadingProvider>
+    </AuthProvider>
 
   );
 }

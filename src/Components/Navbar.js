@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
-
+import { FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { useAuth } from './AuthContext';
 import { FaCheckCircle } from "react-icons/fa";
 import { useLoading } from '../Components/LoadingContext';
 
 import LoadingOverlay from './LoadingOverlay';
 function Navbar({ completedTasksCount }) {
   const { isLoading, setIsLoading, loadingType, setLoadingType } = useLoading();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
 
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    navigate('/');
+  };
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation(); // Get current location
   const navigate = useNavigate();
@@ -73,8 +79,10 @@ function Navbar({ completedTasksCount }) {
             aria-controls="navbarText"
             aria-expanded="false"
             aria-label="Toggle navigation"
+            style={{color:'white'}}
+        
           >
-            <span className="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon" style={{color:'white'}}></span>
           </button>
 
           <div className="collapse navbar-collapse" id="navbarText">
@@ -203,32 +211,68 @@ function Navbar({ completedTasksCount }) {
               </div>
             </div>
 
-            <button
-              onClick={() => handleNavigation("/signin", "signin")}
-              className="btn"
+            {isAuthenticated ? (
+      <div className="user-menu">
+        <div className="dropdown">
+          <button 
+            className="btn user-button"
+            style={{
+              backgroundColor: "#77BFA3",
+              color: "#FAF3DD",
+              border: "none",
+              borderRadius: "20px",
+              padding: "8px 15px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              
+            }}
+          >
+            <FaUser />
+            <div className="container"><span>User</span></div> 
+            
+          </button>
+          <div className="dropdown-content">
+            <button 
+              onClick={handleSignOut}
+              className="signout-button"
               style={{
-                backgroundColor: "#77BFA3",
-                color: "#FAF3DD",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                width: "100%",
+                padding: "8px 15px",
                 border: "none",
-                borderRadius: "20px",
-                padding: "8px 20px",
-                textDecoration: "none",
-                fontSize: "14px",
-                fontWeight: "500",
-                transition: "all 0.3s ease",
-                marginLeft: "10px",
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = "#4A6656";
-                e.target.style.transform = "scale(1.05)";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = "#77BFA3";
-                e.target.style.transform = "scale(1)";
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                color: "#4A6656"
               }}
             >
-              Sign In
+              <FaSignOutAlt /> Sign Out
             </button>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <button
+        onClick={() => handleNavigation("/signin", "signin")}
+        className="btn"
+        style={{
+          backgroundColor: "#77BFA3",
+          color: "#FAF3DD",
+          border: "none",
+          borderRadius: "20px",
+          padding: "8px 20px",
+          textDecoration: "none",
+          fontSize: "14px",
+          fontWeight: "500",
+          transition: "all 0.3s ease",
+          marginLeft: "10px",
+        }}
+      >
+        Sign In
+      </button>
+    )}
           </div>
         </div>
       </nav>

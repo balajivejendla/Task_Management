@@ -543,11 +543,15 @@ return (
    <Navbar completedTasksCount={Taskcomplete.length} />
 
    <div style={{
-  width: "100%",
+  width: "100vw",
   height: "100vh",
   overflow: "hidden",
   marginTop: "-80px",
-  position: "relative"
+  position: "relative",
+  left: "50%",
+  right: "50%",
+  marginLeft: "-50vw",
+  marginRight: "-50vw"
 }}>
   <img 
     src="task.png" 
@@ -593,7 +597,7 @@ return (
     <button 
   onClick={() => {
     const element = document.getElementById('tasks-section');
-    const offset = 950; 
+    const offset = 1200; 
     const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
     window.scrollTo({
       top: elementPosition - offset,
@@ -884,6 +888,8 @@ return (
 
     <br />
 
+<br/>
+<br/>
 
 
 <div className="special-offers mb-4" style={{
@@ -892,7 +898,7 @@ return (
   borderRadius: "8px",
   border: "2px solid #D4A373",
   margin: "20px auto",
-  maxWidth: "90%"
+  width: "100%",
 }}>
   <h3 style={{ 
     color: "#4A6656", 
@@ -960,7 +966,8 @@ return (
       backgroundColor: "#4A6656",
       padding: "15px",
       borderRadius: "8px",
-      color: "#FAF3DD"
+      color: "#FAF3DD",
+      
     }}>
       <h5>🏃‍♂️ Productivity Challenge</h5>
       <div className="d-flex justify-content-between align-items-center">
@@ -1000,7 +1007,10 @@ return (
       Start Productivity Challenge
     </button>
   )}
+
 </div>
+<br/>
+
     
     <div id="tasks-section" className="container" style={{
   border: "5px solid rgb(206, 169, 132)",
@@ -1009,52 +1019,54 @@ return (
   backgroundColor: "#A8D5BA",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   margin: "40px auto",
-  maxWidth: "90%"
+  maxWidth: "100%"
 
 }}>
-  <div className="d-flex justify-content-center mb-4">
+ <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 mb-4">
+  <div className="d-flex flex-column flex-sm-row gap-2 w-100 justify-content-center" style={{ maxWidth: "600px" }}>
     <button
-      className={`btn mx-2 ${activeTab === 'active' ? 'btn-success' : 'btn-outline-success'}`}
+      className={`btn ${activeTab === 'active' ? 'btn-success' : 'btn-outline-success'}`}
       onClick={() => setActiveTab('active')}
       style={{
         backgroundColor: activeTab === 'active' ? "#77BFA3" : "#ffffff",
         color: activeTab === 'active' ? "#ffffff" : "#77BFA3",
         border: "2px solid #77BFA3",
-        width: "200px"
+        width: "100%",
+        maxWidth: "200px"
       }}
     >
       Active Tasks ({totalActiveTasks})
     </button>
     <button
-      className={`btn mx-2 ${activeTab === 'completed' ? 'btn-success' : 'btn-outline-success'}`}
+      className={`btn ${activeTab === 'completed' ? 'btn-success' : 'btn-outline-success'}`}
       onClick={() => setActiveTab('completed')}
       style={{
         backgroundColor: activeTab === 'completed' ? "#77BFA3" : "#ffffff",
         color: activeTab === 'completed' ? "#ffffff" : "#77BFA3",
         border: "2px solid #77BFA3",
-        width: "200px"
+        width: "100%",
+        maxWidth: "200px"
       }}
     >
       Completed Tasks ({totalCompletedTasks})
     </button>
-    <div className="mb-3">
-  <input
-    type="text"
-    placeholder="Search tasks..."
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    className="form-control"
-    style={{
-      backgroundColor: "#FAF3DD",
-      border: "2px solid #D4A373",
-      width: "300px",
-      margin: "0 auto",
-      marginTop:"10px"
-    }}
-  />
-</div>
   </div>
-
+  
+  <div className="w-100" style={{ maxWidth: "300px" }}>
+    <input
+      type="text"
+      placeholder="Search tasks..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="form-control"
+      style={{
+        backgroundColor: "#FAF3DD",
+        border: "2px solid #D4A373",
+        width: "100%"
+      }}
+    />
+  </div>
+</div>
   {activeTab === 'active' ? (
     <>
 
@@ -1365,7 +1377,7 @@ return (
 
 
       <div id="statistics-section" className=" progress-section mb-4" style={{ backgroundColor: "#FAF3DD", padding: "25px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", borderRadius: "8px", border: "2px solid #D4A373",margin: "40px auto",
-    maxWidth: "90%" }}>
+    maxWidth: "100%" }}>
         <div className="statistics-section">
           <h4 style={{ color: "#4A6656", margin: 0 }}>Progress Tracking</h4>
           <button 
@@ -1447,7 +1459,7 @@ return (
 
       {/* Weekly Summary Section */}
       <div className="weekly-summary mb-4" style={{ backgroundColor: "#FAF3DD", padding: "20px",boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-  margin: "40px auto", borderRadius: "8px", border: "2px solid #D4A373",maxWidth: "90%" }}>
+  margin: "40px auto", borderRadius: "8px", border: "2px solid #D4A373",maxWidth: "100%" }}>
         <div className="d-flex justify-content-between">
           <div className="stat-box text-center p-2" style={{ flex: 1 }}>
             <h5 style={{ color: "#4A6656" }}>Tasks Completed Today</h5>
@@ -1470,6 +1482,8 @@ return (
           </div>
         </div>
       </div>
+      <br/>
+      <br/>
 
       <div className="testimonials-section mb-4" style={{ 
   backgroundColor: "#FAF3DD", 
@@ -1477,7 +1491,7 @@ return (
   borderRadius: "8px",
   border: "2px solid #D4A373",
   margin: "40px auto",
-  maxWidth: "90%"
+  maxWidth: "100%"
 }}>
   <h3 style={{ 
     color: "#4A6656", 
@@ -1599,11 +1613,12 @@ return (
 
 
       
-      <div className="contact-section" style={{ 
+      <div className="section-full-width" style={{ 
   backgroundColor: "#5C4033",
   padding: "40px 0",
   marginTop: "40px",
-  color: "#FAF3DD"
+  color: "#FAF3DD",
+
 }}>
   <div className="container">
     <div className="row justify-content-center">
