@@ -1458,30 +1458,74 @@ return (
       </div>
 
       {/* Weekly Summary Section */}
-      <div className="weekly-summary mb-4" style={{ backgroundColor: "#FAF3DD", padding: "20px",boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-  margin: "40px auto", borderRadius: "8px", border: "2px solid #D4A373",maxWidth: "100%" }}>
-        <div className="d-flex justify-content-between">
-          <div className="stat-box text-center p-2" style={{ flex: 1 }}>
-            <h5 style={{ color: "#4A6656" }}>Tasks Completed Today</h5>
-            <h3 style={{ color: "#77BFA3" }}>
-              {Taskcomplete.filter(task => {
-                const today = new Date().toISOString().split('T')[0];
-                return task.date === today;
-              }).length}
-            </h3>
-          </div>
-          <div className="stat-box text-center p-2" style={{ flex: 1 }}>
-            <h5 style={{ color: "#4A6656" }}>Tasks Remaining</h5>
-            <h3 style={{ color: "#D4A373" }}>{Tasks.length + Taskwith.length}</h3>
-          </div>
-          <div className="stat-box text-center p-2" style={{ flex: 1 }}>
-            <h5 style={{ color: "#4A6656" }}>Completion Rate</h5>
-            <h3 style={{ color: "#77BFA3" }}>
-              {Math.round(calculateProgress().overall)}%
-            </h3>
-          </div>
-        </div>
+<div className="weekly-summary mb-4" style={{ 
+  backgroundColor: "#FAF3DD", 
+  padding: "20px",
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+  margin: "40px auto", 
+  borderRadius: "8px", 
+  border: "2px solid #D4A373",
+  maxWidth: "100%"
+}}>
+  <div className="row g-3">
+    <div className="col-12 col-md-4">
+      <div className="stat-box text-center p-2">
+        <h5 style={{ 
+          color: "#4A6656",
+          fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+          marginBottom: "10px"
+        }}>
+          Tasks Completed Today
+        </h5>
+        <h3 style={{ 
+          color: "#77BFA3",
+          fontSize: "clamp(1.5rem, 3vw, 2rem)"
+        }}>
+          {Taskcomplete.filter(task => {
+            const today = new Date().toISOString().split('T')[0];
+            return task.date === today;
+          }).length}
+        </h3>
       </div>
+    </div>
+    
+    <div className="col-12 col-md-4">
+      <div className="stat-box text-center p-2">
+        <h5 style={{ 
+          color: "#4A6656",
+          fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+          marginBottom: "10px"
+        }}>
+          Tasks Remaining
+        </h5>
+        <h3 style={{ 
+          color: "#D4A373",
+          fontSize: "clamp(1.5rem, 3vw, 2rem)"
+        }}>
+          {Tasks.length + Taskwith.length}
+        </h3>
+      </div>
+    </div>
+    
+    <div className="col-12 col-md-4">
+      <div className="stat-box text-center p-2">
+        <h5 style={{ 
+          color: "#4A6656",
+          fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+          marginBottom: "10px"
+        }}>
+          Completion Rate
+        </h5>
+        <h3 style={{ 
+          color: "#77BFA3",
+          fontSize: "clamp(1.5rem, 3vw, 2rem)"
+        }}>
+          {Math.round(calculateProgress().overall)}%
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
       <br/>
       <br/>
 
