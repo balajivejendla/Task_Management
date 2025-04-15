@@ -749,13 +749,13 @@ return (
         </div>
       </div>
 
-<div className="mb-4">
+      <div className="mb-4">
   <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
     Category
   </label>
-  <div className="d-flex gap-2">
+  <div className="d-flex flex-wrap gap-2">
     <select
-      className="form-control"
+      className="form-control flex-grow-1"
       value={taskCategory}
       onChange={(e) => setTaskCategory(e.target.value)}
       style={{
@@ -763,6 +763,7 @@ return (
         border: "2px solid #D4A373",
         outline: "none",
         color: "#5C4033",
+        minWidth: "120px"
       }}
     >
       {categories.map(category => (
@@ -781,6 +782,12 @@ return (
         backgroundColor: "#77BFA3",
         color: "#ffffff",
         border: "none",
+        width: "40px",
+        minWidth: "40px",
+        padding: "0",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
       }}
     >
       +
