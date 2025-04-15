@@ -642,7 +642,7 @@ return (
     <button 
   onClick={() => {
     const element = document.getElementById('tasks-section');
-    const offset = 1200; 
+    const offset = 1250; 
     const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
     window.scrollTo({
       top: elementPosition - offset,
