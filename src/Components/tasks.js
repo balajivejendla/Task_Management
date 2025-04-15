@@ -753,9 +753,9 @@ return (
   <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
     Category
   </label>
-  <div className="d-flex flex-wrap gap-2">
+  <div className="input-group">
     <select
-      className="form-control flex-grow-1"
+      className="form-select"
       value={taskCategory}
       onChange={(e) => setTaskCategory(e.target.value)}
       style={{
@@ -763,7 +763,7 @@ return (
         border: "2px solid #D4A373",
         outline: "none",
         color: "#5C4033",
-        minWidth: "120px"
+        borderRadius: "0.375rem 0 0 0.375rem"
       }}
     >
       {categories.map(category => (
@@ -781,20 +781,19 @@ return (
       style={{
         backgroundColor: "#77BFA3",
         color: "#ffffff",
-        border: "none",
-        width: "40px",
-        minWidth: "40px",
-        padding: "0",
+        border: "2px solid #77BFA3",
+        borderLeft: "none",
+        width: "46px",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        borderRadius: "0 0.375rem 0.375rem 0"
       }}
     >
       +
     </button>
   </div>
 </div>
-
 
       <div className="mb-4">
         <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
@@ -1161,8 +1160,7 @@ return (
 </div>
   {activeTab === 'active' ? (
     <>
-
-<div className="mb-3 d-flex justify-content-center gap-3">
+<div className="mb-3 d-flex flex-column gap-2">
   <select
     className="form-select"
     value={timeFilter}
@@ -1171,7 +1169,9 @@ return (
       backgroundColor: "#FAF3DD",
       border: "2px solid #D4A373",
       color: "#5C4033",
-      width: "200px"
+      width: "100%",
+      maxWidth: "300px",
+      margin: "0 auto"
     }}
   >
     <option value="all">All Tasks</option>
@@ -1180,22 +1180,24 @@ return (
     <option value="week">This Week</option>
   </select>
 
-<select
-  className="form-select"
-  value={categoryFilter}
-  onChange={(e) => setCategoryFilter(e.target.value)}
-  style={{
-    backgroundColor: "#FAF3DD",
-    border: "2px solid #D4A373",
-    color: "#5C4033",
-    width: "200px"
-  }}
->
-  <option value="all">All Categories</option>
-  {categories.map(category => (
-    <option key={category} value={category}>{category}</option>
-  ))}
-</select>
+  <select
+    className="form-select"
+    value={categoryFilter}
+    onChange={(e) => setCategoryFilter(e.target.value)}
+    style={{
+      backgroundColor: "#FAF3DD",
+      border: "2px solid #D4A373",
+      color: "#5C4033",
+      width: "100%",
+      maxWidth: "300px",
+      margin: "0 auto"
+    }}
+  >
+    <option value="all">All Categories</option>
+    {categories.map(category => (
+      <option key={category} value={category}>{category}</option>
+    ))}
+  </select>
 
   <select
     className="form-select"
@@ -1205,7 +1207,9 @@ return (
       backgroundColor: "#FAF3DD",
       border: "2px solid #D4A373",
       color: "#5C4033",
-      width: "200px"
+      width: "100%",
+      maxWidth: "300px",
+      margin: "0 auto"
     }}
   >
     <option value="all">All Priorities</option>
