@@ -7,6 +7,9 @@ const Signin = () => {
     email: '',
     password: '',
   });
+  const [captchaType, setCaptchaType] = useState('text'); // 'text' or 'math'
+const [mathCaptcha, setMathCaptcha] = useState({ question: '', answer: '' });
+
   const [captcha, setCaptcha] = useState('');
   const [userCaptcha, setUserCaptcha] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,6 +20,10 @@ const Signin = () => {
   useEffect(() => {
     generateCaptcha();
   }, []);
+  useEffect(() => {
+    generateCaptcha();
+    generateMathCaptcha();
+  }, []);
 
   const generateCaptcha = () => {
     const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
@@ -26,20 +33,52 @@ const Signin = () => {
     }
     setCaptcha(result);
   };
-
+  const generateMathCaptcha = () => {
+    const operations = ['+', '-', '*'];
+    const operation = operations[Math.floor(Math.random() * operations.length)];
+    let num1, num2, answer;
+  
+    switch (operation) {
+      case '+':
+        num1 = Math.floor(Math.random() * 10);
+        num2 = Math.floor(Math.random() * 10);
+        answer = num1 + num2;
+        break;
+      case '-':
+        num1 = Math.floor(Math.random() * 10) + 5;
+        num2 = Math.floor(Math.random() * 5);
+        answer = num1 - num2;
+        break;
+      case '*':
+        num1 = Math.floor(Math.random() * 5) + 1;
+        num2 = Math.floor(Math.random() * 5) + 1;
+        answer = num1 * num2;
+        break;
+      default:
+        break;
+    }
+  
+    setMathCaptcha({
+      question: `${num1} ${operation} ${num2} = ?`,
+      answer: answer.toString()
+    });
+  };
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (userCaptcha !== captcha) {
+    const isValid = captchaType === 'text' 
+      ? userCaptcha === captcha
+      : userCaptcha === mathCaptcha.answer;
+  
+    if (!isValid) {
       setError('Invalid captcha! Please try again.');
-      generateCaptcha();
+      captchaType === 'text' ? generateCaptcha() : generateMathCaptcha();
       setUserCaptcha('');
       return;
     }
@@ -91,35 +130,92 @@ const Signin = () => {
             />
           </div>
 
-          <div className="captcha-container">
-            <div className="captcha-box">
-              {captcha.split('').map((char, index) => (
-                <span key={index} style={{
-                  transform: `rotate(${Math.random() * 20 - 10}deg)`
-                }}>
-                  {char}
-                </span>
-              ))}
-            </div>
-            <button 
-              type="button" 
-              className="refresh-captcha"
-              onClick={generateCaptcha}
-            >
-              ↻
-            </button>
-          </div>
+          <div className="captcha-section">
+  <div className="captcha-type-toggle">
+    <button 
+      type="button"
+      onClick={() => {
+        setCaptchaType('text');
+        generateCaptcha();
+        setUserCaptcha('');
+      }}
+      className={`toggle-button ${captchaType === 'text' ? 'active' : ''}`}
+      style={{
+        padding: '5px 10px',
+        margin: '0 5px',
+        backgroundColor: captchaType === 'text' ? '#4A6656' : '#FAF3DD',
+        color: captchaType === 'text' ? '#FAF3DD' : '#4A6656',
+        border: '1px solid #4A6656',
+        borderRadius: '4px',
+        cursor: 'pointer'
+      }}
+    >
+      Text Captcha
+    </button>
+    <button 
+      type="button"
+      onClick={() => {
+        setCaptchaType('math');
+        generateMathCaptcha();
+        setUserCaptcha('');
+      }}
+      className={`toggle-button ${captchaType === 'math' ? 'active' : ''}`}
+      style={{
+        padding: '5px 10px',
+        margin: '0 5px',
+        backgroundColor: captchaType === 'math' ? '#4A6656' : '#FAF3DD',
+        color: captchaType === 'math' ? '#FAF3DD' : '#4A6656',
+        border: '1px solid #4A6656',
+        borderRadius: '4px',
+        cursor: 'pointer'
+      }}
+    >
+      Math Captcha
+    </button>
+  </div>
 
-          <div className="form-group">
-            <label>Enter Captcha</label>
-            <input
-              type="text"
-              value={userCaptcha}
-              onChange={(e) => setUserCaptcha(e.target.value)}
-              placeholder="Enter the captcha above"
-              required
-            />
-          </div>
+  <div className="captcha-container">
+    {captchaType === 'text' ? (
+      <div className="captcha-box">
+        {captcha.split('').map((char, index) => (
+          <span key={index} style={{
+            transform: `rotate(${Math.random() * 20 - 10}deg)`
+          }}>
+            {char}
+          </span>
+        ))}
+      </div>
+    ) : (
+      <div className="captcha-box math-captcha">
+        <span style={{ fontSize: '1.2em', fontWeight: 'bold' }}>
+          {mathCaptcha.question}
+        </span>
+      </div>
+    )}
+    <button 
+      type="button" 
+      className="refresh-captcha"
+      onClick={captchaType === 'text' ? generateCaptcha : generateMathCaptcha}
+    >
+      ↻
+    </button>
+  </div>
+
+  <div className="form-group">
+    <label>
+      {captchaType === 'text' ? 'Enter Captcha Text' : 'Enter Answer'}
+    </label>
+    <input
+      type="text"
+      value={userCaptcha}
+      onChange={(e) => setUserCaptcha(e.target.value)}
+      placeholder={captchaType === 'text' ? 'Enter the captcha above' : 'Enter your answer'}
+      required
+    />
+  </div>
+</div>
+
+
 
           <button 
             type="submit" 

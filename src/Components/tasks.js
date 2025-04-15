@@ -17,6 +17,51 @@ function Tasks(){
       const [expandedTasks, setExpandedTasks] = useState({});
       const [activeTab, setActiveTab] = useState('active');
       const totalActiveTasks = Tasks.length + Taskwith.length;
+      const [editingTask, setEditingTask] = useState(null);
+      // Add near the top of your component with other state declarations
+const [categories, setCategories] = useState([
+  'Work',
+  'Personal',
+  'Shopping',
+  'Health',
+  'Study',
+  'Urgent'
+]);
+const [taskCategory, setTaskCategory] = useState('Work');
+const [categoryFilter, setCategoryFilter] = useState('all');
+const [editFormData, setEditFormData] = useState({
+  subject: '',
+  time: '',
+  date: '',
+  notes: '',
+  priority: 'medium'
+});
+const handleEditTask = (task, index, type) => {
+  setEditingTask({ index, type }); // type can be 'regular' or 'reminder'
+  setEditFormData({
+    subject: task.subject,
+    time: task.time,
+    date: task.date,
+    notes: task.notes,
+    priority: task.priority
+  });
+};
+
+const handleUpdateTask = () => {
+  if (editingTask.type === 'regular') {
+    const updatedTasks = [...Tasks];
+    updatedTasks[editingTask.index] = editFormData;
+    setTasks(updatedTasks);
+  } else {
+    const updatedTasksWithReminder = [...Taskwith];
+    updatedTasksWithReminder[editingTask.index] = editFormData;
+    setTaskwith(updatedTasksWithReminder);
+  }
+  setEditingTask(null);
+  setAlertMessage('Task updated successfully!');
+  setAlertType('success');
+  setShowAlert(true);
+};
       
       const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -263,7 +308,7 @@ const calculateProgress = () => {
             setShowAlert(true);
             return;
         }
-            const newTask = { subject: Text1, time: Text2,date:selectedDate, notes: Text3,priority: priority  };
+            const newTask = { subject: Text1, time: Text2,date:selectedDate, notes: Text3,priority: priority,category:taskCategory  };
     
             const updatedTasks = [...Tasks, newTask].sort((a, b) => {
               const dateA = new Date(a.date + 'T' + a.time);
@@ -704,6 +749,46 @@ return (
         </div>
       </div>
 
+<div className="mb-4">
+  <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
+    Category
+  </label>
+  <div className="d-flex gap-2">
+    <select
+      className="form-control"
+      value={taskCategory}
+      onChange={(e) => setTaskCategory(e.target.value)}
+      style={{
+        backgroundColor: "#FAF3DD",
+        border: "2px solid #D4A373",
+        outline: "none",
+        color: "#5C4033",
+      }}
+    >
+      {categories.map(category => (
+        <option key={category} value={category}>{category}</option>
+      ))}
+    </select>
+    <button
+      className="btn"
+      onClick={() => {
+        const newCategory = prompt('Enter new category name:');
+        if (newCategory && !categories.includes(newCategory)) {
+          setCategories([...categories, newCategory]);
+        }
+      }}
+      style={{
+        backgroundColor: "#77BFA3",
+        color: "#ffffff",
+        border: "none",
+      }}
+    >
+      +
+    </button>
+  </div>
+</div>
+
+
       <div className="mb-4">
         <label style={{ color: "#4A6656", fontSize: "18px", fontWeight: 600 }}>
           Notes
@@ -1088,6 +1173,23 @@ return (
     <option value="week">This Week</option>
   </select>
 
+<select
+  className="form-select"
+  value={categoryFilter}
+  onChange={(e) => setCategoryFilter(e.target.value)}
+  style={{
+    backgroundColor: "#FAF3DD",
+    border: "2px solid #D4A373",
+    color: "#5C4033",
+    width: "200px"
+  }}
+>
+  <option value="all">All Categories</option>
+  {categories.map(category => (
+    <option key={category} value={category}>{category}</option>
+  ))}
+</select>
+
   <select
     className="form-select"
     value={priorityFilter}
@@ -1117,86 +1219,143 @@ return (
           </h3>
           <br />
           {Tasks.length === 0 ? (
-            <p
-              style={{
-                fontSize: "24px",
-                fontWeight: "500",
-                marginLeft: "10px",
-                color: "#4A6656",
-                
+  <p style={{
+    fontSize: "24px",
+    fontWeight: "500",
+    marginLeft: "10px",
+    color: "#4A6656",
+  }}>
+    No Tasks Added without Reminder
+  </p>
+) : filterTasks(Tasks).map((task, index) => (
+  <div key={index} className="task-item" style={{
+    backgroundColor: "#FAF3DD",
+    padding: "10px",
+    margin: "10px 0",
+    borderRadius: "8px",
+    border: "2px solid #D4A373",
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.08)",
+    transition: "all 0.3s ease"
+  }}>
+    {editingTask?.type === 'regular' && editingTask?.index === index ? (
+      <div className="edit-form p-3">
+        <input
+          type="text"
+          value={editFormData.subject}
+          onChange={(e) => setEditFormData({...editFormData, subject: e.target.value})}
+          className="form-control mb-2"
+          placeholder="Task Subject"
+        />
+        <div className="d-flex gap-2 mb-2">
+          <input
+            type="time"
+            value={editFormData.time}
+            onChange={(e) => setEditFormData({...editFormData, time: e.target.value})}
+            className="form-control"
+          />
+          <input
+            type="date"
+            value={editFormData.date}
+            onChange={(e) => setEditFormData({...editFormData, date: e.target.value})}
+            className="form-control"
+          />
+        </div>
+        <textarea
+          value={editFormData.notes}
+          onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
+          className="form-control mb-2"
+          placeholder="Notes"
+        />
+        <select
+          value={editFormData.priority}
+          onChange={(e) => setEditFormData({...editFormData, priority: e.target.value})}
+          className="form-control mb-2"
+        >
+          <option value="low">Low Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+        <div className="d-flex gap-2">
+          <button 
+            className="btn btn-success btn-sm"
+            onClick={handleUpdateTask}
+          >
+            Save
+          </button>
+          <button 
+            className="btn btn-secondary btn-sm"
+            onClick={() => setEditingTask(null)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ) : (
+      <>
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                RemoveTask(index);
               }}
+              className="btn btn-success"
+              style={{ marginRight: "15px" }}
             >
-              No Tasks Added without Reminder
-            </p>
-          ) :filterTasks(Tasks).map((task, index) => (
-            <div key={index} className="task-item" style={{
-              backgroundColor: "#FAF3DD",
-              padding: "10px",
-              margin: "10px 0",
-              borderRadius: "8px",
-              border: "2px solid #D4A373",
-              boxShadow: "0 3px 6px rgba(0, 0, 0, 0.08)",
-    transition: "all 0.3s ease",
-    cursor: "pointer",
-    transform: expandedTasks[`task-${index}`] ? "scale(1.02)" : "scale(1)",
-    hover: {
-      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-      
-      transform: "translateY(-2px)"
-    }
-            }}>
-              <div 
-                onClick={() => toggleTaskDetails(`task-${index}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="d-flex align-items-center">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      RemoveTask(index);
-                    }}
-                    className="btn btn-success"
-                    style={{ marginRight: "15px" }}
-                  >
-                    ✅
-                  </button>
-                  <strong style={{color:"#4A6656"}}>
-                    {task.subject}
-                  </strong>
-                  <span style={{marginLeft: "15px", color: "#666"}}>
-                    - {task.notes}
-                  </span>
-                </div>
-              </div>
-          
-              {expandedTasks[`task-${index}`] && (
-                <div className="task-details" style={{
-                  marginTop: "10px",
-                  paddingTop: "10px",
-                  borderTop: "1px solid #D4A373"
-                }}>
-                  <p>
-                    <strong style={{color:"#4A6656", marginRight: "10px"}}>Date:</strong>
-                    {task.date}
-                  </p>
-                  <p>
-                    <strong style={{color:"#4A6656", marginRight: "10px"}}>Time:</strong>
-                    {task.time}
-                  </p>
-                  <p>
-                    <strong style={{color:"#4A6656", marginRight: "10px"}}>Priority:</strong>
-                    <span style={{
-                      color: task.priority === 'high' ? '#dc3545' : 
-                             task.priority === 'medium' ? '#ffc107' : '#28a745',
-                      fontWeight: 'bold'
-                    }}>
-                      {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                    </span>
-                  </p>
-                </div>
-              )}
+              ✅
+            </button>
+            <div>
+              <strong style={{color:"#4A6656"}}>
+                {task.subject}
+              </strong>
+              <span style={{marginLeft: "15px", color: "#666"}}>
+                - {task.notes}
+              </span>
             </div>
-          )) }
+          </div>
+          <button
+            onClick={() => handleEditTask(task, index, 'regular')}
+            className="btn btn-sm"
+            style={{
+              color: "#4A6656",
+              backgroundColor: "transparent",
+              border: "1px solid #4A6656"
+            }}
+          >
+            ✏️ Edit
+          </button>
+        </div>
+
+        {expandedTasks[`task-${index}`] && (
+          <div className="task-details" style={{
+            marginTop: "10px",
+            paddingTop: "10px",
+            borderTop: "1px solid #D4A373"
+          }}>
+            <p>
+              <strong style={{color:"#4A6656", marginRight: "10px"}}>Date:</strong>
+              {task.date}
+            </p>
+            <p>
+              <strong style={{color:"#4A6656", marginRight: "10px"}}>Time:</strong>
+              {task.time}
+            </p>
+            <p>
+              <strong style={{color:"#4A6656", marginRight: "10px"}}>Priority:</strong>
+              <span style={{
+                color: task.priority === 'high' ? '#dc3545' : 
+                       task.priority === 'medium' ? '#ffc107' : '#28a745',
+                fontWeight: 'bold'
+              }}>
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+              </span>
+            </p>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+))}
         </div>
 
         <div className="col-md-6 col-sm-6 col-12 text-center" style={{padding:"20px",boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)"}}>
@@ -1205,85 +1364,143 @@ return (
           </h3>
           <br />
           {Taskwith.length === 0 ? (
-            <p
-              style={{
-                fontSize: "24px",
-                fontWeight: "500",
-                marginLeft: "20px",
-                color: "#4A6656",
+  <p style={{
+    fontSize: "24px",
+    fontWeight: "500",
+    marginLeft: "20px",
+    color: "#4A6656",
+  }}>
+    No Tasks Added with Reminder
+  </p>
+) : (filterTasks(Taskwith).map((task1, index) => (
+  <div key={index} className="task-item" style={{
+    backgroundColor: "#FAF3DD",
+    padding: "10px",
+    margin: "10px 0",
+    borderRadius: "8px",
+    border: "2px solid #D4A373",
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.08)",
+    transition: "all 0.3s ease"
+  }}>
+    {editingTask?.type === 'reminder' && editingTask?.index === index ? (
+      <div className="edit-form p-3">
+        <input
+          type="text"
+          value={editFormData.subject}
+          onChange={(e) => setEditFormData({...editFormData, subject: e.target.value})}
+          className="form-control mb-2"
+          placeholder="Task Subject"
+        />
+        <div className="d-flex gap-2 mb-2">
+          <input
+            type="time"
+            value={editFormData.time}
+            onChange={(e) => setEditFormData({...editFormData, time: e.target.value})}
+            className="form-control"
+          />
+          <input
+            type="date"
+            value={editFormData.date}
+            onChange={(e) => setEditFormData({...editFormData, date: e.target.value})}
+            className="form-control"
+          />
+        </div>
+        <textarea
+          value={editFormData.notes}
+          onChange={(e) => setEditFormData({...editFormData, notes: e.target.value})}
+          className="form-control mb-2"
+          placeholder="Notes"
+        />
+        <select
+          value={editFormData.priority}
+          onChange={(e) => setEditFormData({...editFormData, priority: e.target.value})}
+          className="form-control mb-2"
+        >
+          <option value="low">Low Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+        <div className="d-flex gap-2">
+          <button 
+            className="btn btn-success btn-sm"
+            onClick={handleUpdateTask}
+          >
+            Save
+          </button>
+          <button 
+            className="btn btn-secondary btn-sm"
+            onClick={() => setEditingTask(null)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ) : (
+      <>
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                RemoveReminder(index);
               }}
+              className="btn btn-success"
+              style={{ marginRight: "15px" }}
             >
-              No Tasks Added with Reminder
-            </p>
-          ) : (filterTasks(Taskwith).map((task1, index) => (
-            <div key={index} className="task-item" style={{
-              backgroundColor: "#FAF3DD",
-              padding: "10px",
-              margin: "10px 0",
-              borderRadius: "8px",
-              border: "2px solid #D4A373",
-              boxShadow: "0 3px 6px rgba(0, 0, 0, 0.08)",
-              transition: "all 0.3s ease",
-    cursor: "pointer",
-    transform: expandedTasks[`taskwith-${index}`] ? "scale(1.02)" : "scale(1)",
-    hover: {
-      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-      transform: "translateY(-2px)"
-    }
-            }}>
-              <div 
-                onClick={() => toggleTaskDetails(`taskwith-${index}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="d-flex align-items-center">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      RemoveReminder(index);
-                    }}
-                    className="btn btn-success"
-                    style={{ marginRight: "15px" }}
-                  >
-                    ✅
-                  </button>
-                  <strong style={{color:"#4A6656"}}>
-                    {task1.subject}
-                  </strong>
-                  <span style={{marginLeft: "15px", color: "#666"}}>
-                    - {task1.notes}
-                  </span>
-                </div>
-              </div>
-          
-              {expandedTasks[`taskwith-${index}`] && (
-                <div className="task-details" style={{
-                  marginTop: "10px",
-                  paddingTop: "10px",
-                  borderTop: "1px solid #D4A373"
-                }}>
-                  <p>
-                    <strong style={{color:"#4A6656", marginRight: "10px"}}>Date:</strong>
-                    {task1.date}
-                  </p>
-                  <p>
-                    <strong style={{color:"#4A6656", marginRight: "10px"}}>Time:</strong>
-                    {task1.time}
-                  </p>
-                  <p>
-                    <strong style={{color:"#4A6656", marginRight: "10px"}}>Priority:</strong>
-                    <span style={{
-                      color: task1.priority === 'high' ? '#dc3545' : 
-                             task1.priority === 'medium' ? '#ffc107' : '#28a745',
-                      fontWeight: 'bold'
-                    }}>
-                      {task1.priority.charAt(0).toUpperCase() + task1.priority.slice(1)}
-                    </span>
-                  </p>
-                </div>
-              )}
+              ✅
+            </button>
+            <div>
+              <strong style={{color:"#4A6656"}}>
+                {task1.subject}
+              </strong>
+              <span style={{marginLeft: "15px", color: "#666"}}>
+                - {task1.notes}
+              </span>
             </div>
-          )))
-           }
+          </div>
+          <button
+            onClick={() => handleEditTask(task1, index, 'reminder')}
+            className="btn btn-sm"
+            style={{
+              color: "#4A6656",
+              backgroundColor: "transparent",
+              border: "1px solid #4A6656"
+            }}
+          >
+            ✏️ Edit
+          </button>
+        </div>
+
+        {expandedTasks[`taskwith-${index}`] && (
+          <div className="task-details" style={{
+            marginTop: "10px",
+            paddingTop: "10px",
+            borderTop: "1px solid #D4A373"
+          }}>
+            <p>
+              <strong style={{color:"#4A6656", marginRight: "10px"}}>Date:</strong>
+              {task1.date}
+            </p>
+            <p>
+              <strong style={{color:"#4A6656", marginRight: "10px"}}>Time:</strong>
+              {task1.time}
+            </p>
+            <p>
+              <strong style={{color:"#4A6656", marginRight: "10px"}}>Priority:</strong>
+              <span style={{
+                color: task1.priority === 'high' ? '#dc3545' : 
+                       task1.priority === 'medium' ? '#ffc107' : '#28a745',
+                fontWeight: 'bold'
+              }}>
+                {task1.priority.charAt(0).toUpperCase() + task1.priority.slice(1)}
+              </span>
+            </p>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+)))}
         </div>
       </div>
 
