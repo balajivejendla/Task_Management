@@ -4,6 +4,7 @@ export default function Tips() {
   const [isOpen, setIsOpen] = useState(true);
 
   const tips = [
+    'Press "T" to quickly focus on task input',
     'Click ✅ to mark tasks as complete',
     'Use high priority for urgent tasks',
     'Set reminders for important deadlines',

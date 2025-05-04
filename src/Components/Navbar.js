@@ -57,19 +57,30 @@ function Navbar({ completedTasksCount }) {
         }}
       >
         <div className="container-fluid">
-          <div
-            className="navbar-brand fw-bold"
-            style={{
-              color: "#FAF3DD",
-              fontSize: "1.5rem",
-              letterSpacing: "1px",
-              fontFamily: "'Poppins', sans-serif",
-              textTransform: "uppercase",
-              padding: "8px 15px",
-              transition: "all 0.3s ease",
-            }}
-          >
-            TaskFlow Pro
+          <div className="d-flex align-items-center">
+            <img 
+              src="/task-logo.svg" 
+              alt="TaskFlow Pro Logo"
+              style={{
+                width: "40px",
+                height: "40px",
+                marginRight: "10px"
+              }}
+            />
+            <div
+              className="navbar-brand fw-bold"
+              style={{
+                color: "#FAF3DD",
+                fontSize: "1.5rem",
+                letterSpacing: "1px",
+                fontFamily: "'Poppins', sans-serif",
+                textTransform: "uppercase",
+                padding: "8px 15px",
+                transition: "all 0.3s ease",
+              }}
+            >
+              TaskFlow Pro
+            </div>
           </div>
           <button
             className="navbar-toggler"

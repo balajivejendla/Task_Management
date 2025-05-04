@@ -1,505 +1,562 @@
-import React, { useState ,useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import TaskAlert from './Alert';
 import { FaGithub, FaLinkedin, FaEnvelope, FaPhone } from 'react-icons/fa';
 import { FaArrowUp } from 'react-icons/fa';
+import Calendar from './Calendar';
 
-function Tasks(){
-      const [showBackToTop, setShowBackToTop] = useState(false);
-      const[Text1,setText1]=useState('');
-      const[Text2,setText2]=useState('');
-      const[Text3,setText3]=useState('');
-      const[Tasks,setTasks]=useState([]);
-      const[Taskwith,setTaskwith]=useState([]);
-      const[Taskcomplete,setTaskcomplete]=useState([]);
-      const [timeFilter, setTimeFilter] = useState('all');
-      const [priority, setPriority] = useState('medium');
-      const [expandedTasks, setExpandedTasks] = useState({});
-      const [activeTab, setActiveTab] = useState('active');
-      const totalActiveTasks = Tasks.length + Taskwith.length;
-      const [editingTask, setEditingTask] = useState(null);
-      // Add near the top of your component with other state declarations
-const [categories, setCategories] = useState([
-  'Work',
-  'Personal',
-  'Shopping',
-  'Health',
-  'Study',
-  'Urgent'
-]);
-const [taskCategory, setTaskCategory] = useState('Work');
-const [categoryFilter, setCategoryFilter] = useState('all');
-const [editFormData, setEditFormData] = useState({
-  subject: '',
-  time: '',
-  date: '',
-  notes: '',
-  priority: 'medium'
-});
-const handleEditTask = (task, index, type) => {
-  setEditingTask({ index, type }); // type can be 'regular' or 'reminder'
-  setEditFormData({
-    subject: task.subject,
-    time: task.time,
-    date: task.date,
-    notes: task.notes,
-    priority: task.priority
+// Add keyboard shortcut handler
+const useKeyboardShortcut = (key, callback) => {
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key.toLowerCase() === key.toLowerCase() && !event.target.matches('input, textarea')) {
+        event.preventDefault();
+        callback();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [key, callback]);
+};
+
+// Add these styles at the top of the file
+const commonButtonStyles = {
+  backgroundColor: "#77BFA3",
+  color: "#FAF3DD",
+  border: "none",
+  padding: "10px 20px",
+  borderRadius: "25px",
+  fontSize: "1.1rem",
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+  '&:hover': {
+    backgroundColor: "#4A6656",
+    transform: "translateY(-2px)",
+  }
+};
+
+const commonCardStyles = {
+  backgroundColor: "#FAF3DD",
+  padding: "20px",
+  borderRadius: "8px",
+  border: "2px solid #D4A373",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+  transition: "all 0.3s ease",
+  '&:hover': {
+    boxShadow: "0 6px 12px rgba(0,0,0,0.15)",
+  }
+};
+
+function Tasks() {
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const[Text1,setText1]=useState('');
+  const[Text2,setText2]=useState('');
+  const[Text3,setText3]=useState('');
+  const[Tasks,setTasks]=useState([]);
+  const[Taskwith,setTaskwith]=useState([]);
+  const[Taskcomplete,setTaskcomplete]=useState([]);
+  const [timeFilter, setTimeFilter] = useState('all');
+  const [priority, setPriority] = useState('medium');
+  const [expandedTasks, setExpandedTasks] = useState({});
+  const [activeTab, setActiveTab] = useState('active');
+  const [showCalendar, setShowCalendar] = useState(false);
+  const totalActiveTasks = Tasks.length + Taskwith.length;
+  const [editingTask, setEditingTask] = useState(null);
+  // Add near the top of your component with other state declarations
+  const [categories, setCategories] = useState([
+    'Work',
+    'Personal',
+    'Shopping',
+    'Health',
+    'Study',
+    'Urgent'
+  ]);
+  const [taskCategory, setTaskCategory] = useState('Work');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [editFormData, setEditFormData] = useState({
+    subject: '',
+    time: '',
+    date: '',
+    notes: '',
+    priority: 'medium'
   });
-};
-
-const handleUpdateTask = () => {
-  if (editingTask.type === 'regular') {
-    const updatedTasks = [...Tasks];
-    updatedTasks[editingTask.index] = editFormData;
-    setTasks(updatedTasks);
-  } else {
-    const updatedTasksWithReminder = [...Taskwith];
-    updatedTasksWithReminder[editingTask.index] = editFormData;
-    setTaskwith(updatedTasksWithReminder);
-  }
-  setEditingTask(null);
-  setAlertMessage('Task updated successfully!');
-  setAlertType('success');
-  setShowAlert(true);
-};
-      
-      const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('success');
-const totalCompletedTasks = Taskcomplete.length;
-const [showTips, setShowTips] = useState(localStorage.getItem('hideTaskTips') !== 'true');
-const [completedTips, setCompletedTips] = useState(JSON.parse(localStorage.getItem('completedTips') || '[]'));
-const [isOpen, setIsOpen] = useState(false);
-const [priorityFilter, setPriorityFilter] = useState('all');
-const [userExperience, setUserExperience] = useState('beginner'); // beginner, intermediate, advanced
-const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
-const [autoSchedule, setAutoSchedule] = useState(false);
-const [showTypingAnimation, setShowTypingAnimation] = useState(true);
-const [showLearningTips, setShowLearningTips] = useState(false);
-const [specialOffer, setSpecialOffer] = useState({
-  active: true,
-  endsIn: 24 * 60 * 60, // 24 hours in seconds
-});
-
-const [productivityChallenge, setProductivityChallenge] = useState({
-  active: false,
-  targetTasks: 5,
-  timeLimit: 2 * 60 * 60, // 2 hours in seconds
-  completedTasks: 0,
-  timeRemaining: 2 * 60 * 60,
-});
-const learningTips = [
-  'Create smaller, manageable tasks instead of large ones',
-  'Use high priority for urgent and important tasks',
-  'Set specific deadlines for better time management',
-  'Review your completed tasks to track progress',
-  'Take breaks between tasks to maintain productivity',
-  'Update task status regularly to stay organized'
-];
-const todayCompletedTasks = Taskcomplete.filter(task => {
-  const today = new Date().toISOString().split('T')[0];
-  return task.date === today;
-}).length;
-const handleDateChange = (e) => {
-  const date = e.target.value;
-  setSelectedDate(date);
-  
-  // Automatically suggest priority based on date
-  if (userExperience === 'beginner') {
-    const suggestedPriority = suggestPriority(Text1, date);
-    setPriority(suggestedPriority);
-  }
-};
-useEffect(() => {
-  const timer = setInterval(() => {
-    // Update special offer countdown
-    if (specialOffer.active && specialOffer.endsIn > 0) {
-      setSpecialOffer(prev => ({
-        ...prev,
-        endsIn: prev.endsIn - 1
-      }));
-    }
-
-    // Update productivity challenge countdown
-    if (productivityChallenge.active && productivityChallenge.timeRemaining > 0) {
-      setProductivityChallenge(prev => ({
-        ...prev,
-        timeRemaining: prev.timeRemaining - 1
-      }));
-    }
-  }, 1000);
-
-  return () => clearInterval(timer);
-}, [specialOffer.active, productivityChallenge.active]);
-useEffect(() => {
-  const handleScroll = () => {
-    if (window.pageYOffset > 1200) {
-      setShowBackToTop(true);
-    } else {
-      setShowBackToTop(false);
-    }
+  const handleEditTask = (task, index, type) => {
+    setEditingTask({ index, type }); // type can be 'regular' or 'reminder'
+    setEditFormData({
+      subject: task.subject,
+      time: task.time,
+      date: task.date,
+      notes: task.notes,
+      priority: task.priority
+    });
   };
 
-  window.addEventListener('scroll', handleScroll);
-  return () => window.removeEventListener('scroll', handleScroll);
-}, []);
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-};
-
-const AdvancedFeatures = () => (
-  <div className="advanced-features p-3" style={{ 
-    backgroundColor: "#FAF3DD",
-    border: "1px solid #D4A373",
-    borderRadius: "8px",
-    marginTop: "20px"
-  }}>
-    <div className="d-flex justify-content-between align-items-center">
-      <h5 style={{ color: "#4A6656" }}>Advanced Features</h5>
-      <div className="form-check form-switch">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          checked={autoSchedule}
-          onChange={(e) => setAutoSchedule(e.target.checked)}
-        />
-        <label className="form-check-label" style={{ color: "#4A6656" }}>
-          Auto Schedule
-        </label>
-      </div>
-    </div>
-  </div>
-);
-const tips = [
-  'Click ✅ to mark tasks as complete',
-  'Use high priority for urgent tasks',
-  'Set reminders for important deadlines',
-  'Filter tasks by date using the dropdown',
-  'Click on a task to see more details',
-  'Use search to find specific tasks quickly'
-];
-const [searchQuery, setSearchQuery] = useState('');
-const [showProgress, setShowProgress] = useState(true);
-
-const [selectedDate, setSelectedDate] = useState('');
-
-const toggleTaskDetails = (taskId) => {
-  setExpandedTasks(prev => ({
-    ...prev,
-    [taskId]: !prev[taskId]
-  }));
-};
-const formatTime = (seconds) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-};
-
-const startProductivityChallenge = () => {
-  setProductivityChallenge({
+  const handleUpdateTask = () => {
+    if (editingTask.type === 'regular') {
+      const updatedTasks = [...Tasks];
+      updatedTasks[editingTask.index] = editFormData;
+      setTasks(updatedTasks);
+    } else {
+      const updatedTasksWithReminder = [...Taskwith];
+      updatedTasksWithReminder[editingTask.index] = editFormData;
+      setTaskwith(updatedTasksWithReminder);
+    }
+    setEditingTask(null);
+    setAlertMessage('Task updated successfully!');
+    setAlertType('success');
+    setShowAlert(true);
+  };
+      
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('success');
+  const totalCompletedTasks = Taskcomplete.length;
+  const [showTips, setShowTips] = useState(localStorage.getItem('hideTaskTips') !== 'true');
+  const [completedTips, setCompletedTips] = useState(JSON.parse(localStorage.getItem('completedTips') || '[]'));
+  const [isOpen, setIsOpen] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [userExperience, setUserExperience] = useState('beginner'); // beginner, intermediate, advanced
+  const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
+  const [autoSchedule, setAutoSchedule] = useState(false);
+  const [showTypingAnimation, setShowTypingAnimation] = useState(true);
+  const [showLearningTips, setShowLearningTips] = useState(false);
+  const [specialOffer, setSpecialOffer] = useState({
     active: true,
+    endsIn: 24 * 60 * 60, // 24 hours in seconds
+  });
+
+  const [productivityChallenge, setProductivityChallenge] = useState({
+    active: false,
     targetTasks: 5,
-    timeLimit: 2 * 60 * 60,
+    timeLimit: 2 * 60 * 60, // 2 hours in seconds
     completedTasks: 0,
     timeRemaining: 2 * 60 * 60,
   });
-};
-const suggestPriority = (taskName, dueDate) => {
-  const today = new Date();
-  const taskDate = new Date(dueDate);
-  const daysDiff = Math.floor((taskDate - today) / (1000 * 60 * 60 * 24));
-  
-  if (taskName.toLowerCase().includes('urgent') || daysDiff <= 1) {
-    return 'high';
-  } else if (daysDiff <= 3) {
-    return 'medium';
-  }
-  return 'low';
-};
-const updateProductivityChallenge = () => {
-  if (productivityChallenge.active) {
-    setProductivityChallenge(prev => {
-      const newCompletedTasks = prev.completedTasks + 1;
-      if (newCompletedTasks >= prev.targetTasks) {
-        // Challenge completed!
-        setShowAlert(true);
-        setAlertMessage("🎉 Congratulations! You've completed the productivity challenge!");
-        setAlertType('success');
-        return { ...prev, active: false };
-      }
-      return { ...prev, completedTasks: newCompletedTasks };
-    });
-  }
-};
-
-
-const filterTasks = (tasks) => {
-  // First filter by priority if selected
-  let filteredTasks = tasks;
-  if (searchQuery.trim() !== '') {
-    filteredTasks = tasks.filter(task => 
-      task.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.notes.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }
-
-  // Then filter by priority
-  if (priorityFilter !== 'all') {
-    filteredTasks = filteredTasks.filter(task => task.priority === priorityFilter);
-  }
-
-  // Finally filter by time
-  const currentDate = new Date();
-  const today = new Date().setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today + 86400000).setHours(0, 0, 0, 0);
-  const weekLater = new Date(today + 7 * 86400000).setHours(0, 0, 0, 0);
-
-  switch(timeFilter) {
-    case 'today':
-      return filteredTasks.filter(task => {
-        const taskDate = new Date(task.date).setHours(0, 0, 0, 0);
-        return taskDate === today;
-      });
-    case 'tomorrow':
-      return filteredTasks.filter(task => {
-        const taskDate = new Date(task.date).setHours(0, 0, 0, 0);
-        return taskDate === tomorrow;
-      });
-    case 'week':
-      return filteredTasks.filter(task => {
-        const taskDate = new Date(task.date).setHours(0, 0, 0, 0);
-        return taskDate <= weekLater && taskDate >= today;
-      });
-    default:
-      return filteredTasks;
-  }
-};
-
-const calculateProgress = () => {
-  const totalTasks = Tasks.length + Taskwith.length + Taskcomplete.length;
-  const completedTasks = Taskcomplete.length;
-  
-  const highPriorityTotal = [...Tasks, ...Taskwith, ...Taskcomplete].filter(t => t.priority === 'high').length;
-  const highPriorityCompleted = Taskcomplete.filter(t => t.priority === 'high').length;
-  
-  const mediumPriorityTotal = [...Tasks, ...Taskwith, ...Taskcomplete].filter(t => t.priority === 'medium').length;
-  const mediumPriorityCompleted = Taskcomplete.filter(t => t.priority === 'medium').length;
-  
-  const lowPriorityTotal = [...Tasks, ...Taskwith, ...Taskcomplete].filter(t => t.priority === 'low').length;
-  const lowPriorityCompleted = Taskcomplete.filter(t => t.priority === 'low').length;
-
-  
-  return {
-    overall: totalTasks ? (completedTasks / totalTasks) * 100 : 0,
-    high: highPriorityTotal ? (highPriorityCompleted / highPriorityTotal) * 100 : 0,
-    medium: mediumPriorityTotal ? (mediumPriorityCompleted / mediumPriorityTotal) * 100 : 0,
-    low: lowPriorityTotal ? (lowPriorityCompleted / lowPriorityTotal) * 100 : 0
+  const learningTips = [
+    'Press "T" to quickly focus on task input',
+    'Create smaller, manageable tasks instead of large ones',
+    'Use high priority for urgent and important tasks',
+    'Set specific deadlines for better time management',
+    'Review your completed tasks to track progress',
+    'Take breaks between tasks to maintain productivity',
+    'Update task status regularly to stay organized'
+  ];
+  const todayCompletedTasks = Taskcomplete.filter(task => {
+    const today = new Date().toISOString().split('T')[0];
+    return task.date === today;
+  }).length;
+  const handleDateChange = (e) => {
+    const date = e.target.value;
+    setSelectedDate(date);
+    
+    // Automatically suggest priority based on date
+    if (userExperience === 'beginner') {
+      const suggestedPriority = suggestPriority(Text1, date);
+      setPriority(suggestedPriority);
+    }
   };
-};
+  useEffect(() => {
+    const timer = setInterval(() => {
+      // Update special offer countdown
+      if (specialOffer.active && specialOffer.endsIn > 0) {
+        setSpecialOffer(prev => ({
+          ...prev,
+          endsIn: prev.endsIn - 1
+        }));
+      }
 
-      const taskadder = () => {
-        if (Text1.trim() === "" || Text2.trim() === "") {
-            alert("Please Enter Both Task and Time if Notes");
-            setAlertType('error');
-            setShowAlert(true);
-            return;
-        }
-            const newTask = { subject: Text1, time: Text2,date:selectedDate, notes: Text3,priority: priority,category:taskCategory  };
-    
-            const updatedTasks = [...Tasks, newTask].sort((a, b) => {
-              const dateA = new Date(a.date + 'T' + a.time);
-              const dateB = new Date(b.date + 'T' + b.time);
-              return dateA - dateB;
-          });
-    
-        setTasks(updatedTasks);
-        setText1("");
-        setText2("");
-        setText3("");
-        setSelectedDate("");
-        console.log(updatedTasks);
-        setPriority("medium");
-        setAlertMessage(`Task added successfully! ${todayCompletedTasks > 0 
-          ? `You've completed ${todayCompletedTasks} ${todayCompletedTasks === 1 ? 'task' : 'tasks'} today! Keep up the great work! 🎉 ⭐` 
-          : 'Keep going! 💪'}`);
-        setAlertType('success');
-        setShowAlert(true);
+      // Update productivity challenge countdown
+      if (productivityChallenge.active && productivityChallenge.timeRemaining > 0) {
+        setProductivityChallenge(prev => ({
+          ...prev,
+          timeRemaining: prev.timeRemaining - 1
+        }));
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [specialOffer.active, productivityChallenge.active]);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.pageYOffset > 1200) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
     };
-    const taskadderwith = () => {
-      if (Text1.trim() === "" || Text2.trim() === "") {
-          alert("Please Enter Both Task and Time if Notes");
-          return;
-      }
-  
-      const newTask1 = { subject: Text1, time: Text2,date: selectedDate, notes: Text3,priority: priority  };
-  
-      // Add the task and sort in ascending order based on time
-      const updatedTask = [...Taskwith, newTask1].sort((a, b) => {
-        const dateA = new Date(a.date + 'T' + a.time);
-        const dateB = new Date(b.date + 'T' + b.time);
-        return dateA - dateB;
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
     });
-  
-      setTaskwith(updatedTask);
-      setText1("");
-      setText2("");
-      setText3("");
-      setSelectedDate("");
-      console.log(updatedTask);
-      setPriority("medium");
-
   };
-  
-      const handleonchange1=(event)=>{
-        setText1(event.target.value);
-      }
-      const handleonchange2=(event)=>{
-        setText2(event.target.value);
-      }
-      const handleonchange3=(event)=>{
-        setText3(event.target.value);
-      }
-     const RemoveTask=(index)=>{
-      const completed_task=Tasks[index];
-        setTasks(Tasks.filter((_, i) => i !== index));
-        setTaskcomplete([...Taskcomplete,completed_task]);
-        console.log(Taskcomplete)
-        updateProductivityChallenge();
-        
-       }
-       const RemoveReminder=(index)=>{
-        setReminders((prevReminder)=>prevReminder.filter((reminder)=>reminder.index!==index))
-        alert("reminder has been removed")
-        const task_completed=Taskwith[index];
-        setTaskwith(Taskwith.filter((_, i) => i !==index));
-        setTaskcomplete([...Taskcomplete,task_completed]);
-        updateProductivityChallenge();
-       }
 
+  const AdvancedFeatures = () => (
+    <div className="advanced-features p-3" style={{ 
+      backgroundColor: "#FAF3DD",
+      border: "1px solid #D4A373",
+      borderRadius: "8px",
+      marginTop: "20px"
+    }}>
+      <div className="d-flex justify-content-between align-items-center">
+        <h5 style={{ color: "#4A6656" }}>Advanced Features</h5>
+        <div className="form-check form-switch">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            checked={autoSchedule}
+            onChange={(e) => setAutoSchedule(e.target.checked)}
+          />
+          <label className="form-check-label" style={{ color: "#4A6656" }}>
+            Auto Schedule
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+  const tips = [
+    'Click ✅ to mark tasks as complete',
+    'Use high priority for urgent tasks',
+    'Set reminders for important deadlines',
+    'Filter tasks by date using the dropdown',
+    'Click on a task to see more details',
+    'Use search to find specific tasks quickly'
+  ];
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showProgress, setShowProgress] = useState(true);
 
+  const [selectedDate, setSelectedDate] = useState('');
 
-         const [reminders, setReminders] = useState([]); 
-       
+  const toggleTaskDetails = (taskId) => {
+    setExpandedTasks(prev => ({
+      ...prev,
+      [taskId]: !prev[taskId]
+    }));
+  };
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
-         const handleSetReminder = () => {
-           if (!Text1 || !Text2) {
-             alert("Please enter a reminder message and time.");
-             return;
-           }
-       
-           const newReminder = {
-             text: Text1,
-             time: Text2,
-           };
-       
-           setReminders((prevReminders) => [...prevReminders, newReminder]);
-           alert(`Reminder set for ${Text2}.`);
-       
-
-           setText1("");
-           setText2("");
-         };
-         useEffect(() => {
-          const savedHideTips = localStorage.getItem('hideTaskTips');
-          const savedCompletedTips = localStorage.getItem('completedTips');
-          
-          if (savedHideTips) {
-            setShowTips(savedHideTips !== 'true');
-          }
-          
-          if (savedCompletedTips) {
-            setCompletedTips(JSON.parse(savedCompletedTips));
-          }
-        }, []);
-        useEffect(() => {
-          // Track user experience level based on completed tasks
-          const totalCompletedTasks = Taskcomplete.length;
-          if (totalCompletedTasks > 30) {
-            setUserExperience('advanced');
-            setShowAdvancedFeatures(true);
-          } else if (totalCompletedTasks > 10) {
-            setUserExperience('intermediate');
-          }
-        }, [Taskcomplete.length]);
-       
-         useEffect(() => {
-           if (reminders.length === 0) return;
-       
-           const interval = setInterval(() => {
-             const currentTime = new Date().toLocaleTimeString([], {
-               hour: "2-digit",
-               minute: "2-digit",
-               hour12: false,
-             });
-       
-
-             const triggeredReminders = reminders.filter((reminder) => reminder.time === currentTime);
-       
-             if (triggeredReminders.length > 0) {
-               triggeredReminders.forEach((reminder) => {
-                 alert(`Reminder: ${reminder.text}`);
-               });
-
-               setReminders((prevReminders) =>
-                 prevReminders.filter((reminder) => !triggeredReminders.includes(reminder))
-               );
-             }
-           }, 1000);
-       
-           return () => clearInterval(interval);
-         }, [reminders]);
-       
+  const startProductivityChallenge = () => {
+    setProductivityChallenge({
+      active: true,
+      targetTasks: 5,
+      timeLimit: 2 * 60 * 60,
+      completedTasks: 0,
+      timeRemaining: 2 * 60 * 60,
+    });
+  };
+  const suggestPriority = (taskName, dueDate) => {
+    const today = new Date();
+    const taskDate = new Date(dueDate);
+    const daysDiff = Math.floor((taskDate - today) / (1000 * 60 * 60 * 24));
     
-return (
-  <>
-  {showBackToTop && (
-  <div style={{
+    if (taskName.toLowerCase().includes('urgent') || daysDiff <= 1) {
+      return 'high';
+    } else if (daysDiff <= 3) {
+      return 'medium';
+    }
+    return 'low';
+  };
+  const updateProductivityChallenge = () => {
+    if (productivityChallenge.active) {
+      setProductivityChallenge(prev => {
+        const newCompletedTasks = prev.completedTasks + 1;
+        if (newCompletedTasks >= prev.targetTasks) {
+          // Challenge completed!
+          setShowAlert(true);
+          setAlertMessage("🎉 Congratulations! You've completed the productivity challenge!");
+          setAlertType('success');
+          return { ...prev, active: false };
+        }
+        return { ...prev, completedTasks: newCompletedTasks };
+      });
+    }
+  };
+
+
+  const filterTasks = (tasks) => {
+    // First filter by priority if selected
+    let filteredTasks = tasks;
+    if (searchQuery.trim() !== '') {
+      filteredTasks = tasks.filter(task => 
+        task.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.notes.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Then filter by priority
+    if (priorityFilter !== 'all') {
+      filteredTasks = filteredTasks.filter(task => task.priority === priorityFilter);
+    }
+
+    // Finally filter by time
+    const currentDate = new Date();
+    const today = new Date().setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today + 86400000).setHours(0, 0, 0, 0);
+    const weekLater = new Date(today + 7 * 86400000).setHours(0, 0, 0, 0);
+
+    switch(timeFilter) {
+      case 'today':
+        return filteredTasks.filter(task => {
+          const taskDate = new Date(task.date).setHours(0, 0, 0, 0);
+          return taskDate === today;
+        });
+      case 'tomorrow':
+        return filteredTasks.filter(task => {
+          const taskDate = new Date(task.date).setHours(0, 0, 0, 0);
+          return taskDate === tomorrow;
+        });
+      case 'week':
+        return filteredTasks.filter(task => {
+          const taskDate = new Date(task.date).setHours(0, 0, 0, 0);
+          return taskDate <= weekLater && taskDate >= today;
+        });
+      default:
+        return filteredTasks;
+    }
+  };
+
+  const calculateProgress = () => {
+    const totalTasks = Tasks.length + Taskwith.length + Taskcomplete.length;
+    const completedTasks = Taskcomplete.length;
+    
+    const highPriorityTotal = [...Tasks, ...Taskwith, ...Taskcomplete].filter(t => t.priority === 'high').length;
+    const highPriorityCompleted = Taskcomplete.filter(t => t.priority === 'high').length;
+    
+    const mediumPriorityTotal = [...Tasks, ...Taskwith, ...Taskcomplete].filter(t => t.priority === 'medium').length;
+    const mediumPriorityCompleted = Taskcomplete.filter(t => t.priority === 'medium').length;
+    
+    const lowPriorityTotal = [...Tasks, ...Taskwith, ...Taskcomplete].filter(t => t.priority === 'low').length;
+    const lowPriorityCompleted = Taskcomplete.filter(t => t.priority === 'low').length;
+
+    
+    return {
+      overall: totalTasks ? (completedTasks / totalTasks) * 100 : 0,
+      high: highPriorityTotal ? (highPriorityCompleted / highPriorityTotal) * 100 : 0,
+      medium: mediumPriorityTotal ? (mediumPriorityCompleted / mediumPriorityTotal) * 100 : 0,
+      low: lowPriorityTotal ? (lowPriorityCompleted / lowPriorityTotal) * 100 : 0
+    };
+  };
+
+  const taskadder = () => {
+    if (Text1.trim() === "" || Text2.trim() === "") {
+        alert("Please Enter Both Task and Time if Notes");
+        setAlertType('error');
+        setShowAlert(true);
+        return;
+    }
+        const newTask = { subject: Text1, time: Text2,date:selectedDate, notes: Text3,priority: priority,category:taskCategory  };
+    
+        const updatedTasks = [...Tasks, newTask].sort((a, b) => {
+          const dateA = new Date(a.date + 'T' + a.time);
+          const dateB = new Date(b.date + 'T' + b.time);
+          return dateA - dateB;
+      });
+    
+    setTasks(updatedTasks);
+    setText1("");
+    setText2("");
+    setText3("");
+    setSelectedDate("");
+    console.log(updatedTasks);
+    setPriority("medium");
+    setAlertMessage(`Task added successfully! ${todayCompletedTasks > 0 
+      ? `You've completed ${todayCompletedTasks} ${todayCompletedTasks === 1 ? 'task' : 'tasks'} today! Keep up the great work! 🎉 ⭐` 
+      : 'Keep going! 💪'}`);
+    setAlertType('success');
+    setShowAlert(true);
+};
+const taskadderwith = () => {
+  if (Text1.trim() === "" || Text2.trim() === "") {
+      alert("Please Enter Both Task and Time if Notes");
+      return;
+  }
+
+  const newTask1 = { subject: Text1, time: Text2,date: selectedDate, notes: Text3,priority: priority  };
+
+  // Add the task and sort in ascending order based on time
+  const updatedTask = [...Taskwith, newTask1].sort((a, b) => {
+    const dateA = new Date(a.date + 'T' + a.time);
+    const dateB = new Date(b.date + 'T' + b.time);
+    return dateA - dateB;
+});
+
+  setTaskwith(updatedTask);
+  setText1("");
+  setText2("");
+  setText3("");
+  setSelectedDate("");
+  console.log(updatedTask);
+  setPriority("medium");
+
+};
+
+const handleonchange1=(event)=>{
+  setText1(event.target.value);
+}
+const handleonchange2=(event)=>{
+  setText2(event.target.value);
+}
+const handleonchange3=(event)=>{
+  setText3(event.target.value);
+}
+ const RemoveTask=(index)=>{
+  const completed_task=Tasks[index];
+    setTasks(Tasks.filter((_, i) => i !== index));
+    setTaskcomplete([...Taskcomplete,completed_task]);
+    console.log(Taskcomplete)
+    updateProductivityChallenge();
+    
+   }
+   const RemoveReminder=(index)=>{
+    setReminders((prevReminder)=>prevReminder.filter((reminder)=>reminder.index!==index))
+    alert("reminder has been removed")
+    const task_completed=Taskwith[index];
+    setTaskwith(Taskwith.filter((_, i) => i !==index));
+    setTaskcomplete([...Taskcomplete,task_completed]);
+    updateProductivityChallenge();
+   }
+
+
+
+     const [reminders, setReminders] = useState([]); 
+   
+
+     const handleSetReminder = () => {
+       if (!Text1 || !Text2) {
+         alert("Please enter a reminder message and time.");
+         return;
+       }
+   
+       const newReminder = {
+         text: Text1,
+         time: Text2,
+       };
+   
+       setReminders((prevReminders) => [...prevReminders, newReminder]);
+       alert(`Reminder set for ${Text2}.`);
+   
+
+       setText1("");
+       setText2("");
+     };
+     useEffect(() => {
+      const savedHideTips = localStorage.getItem('hideTaskTips');
+      const savedCompletedTips = localStorage.getItem('completedTips');
+      
+      if (savedHideTips) {
+        setShowTips(savedHideTips !== 'true');
+      }
+      
+      if (savedCompletedTips) {
+        setCompletedTips(JSON.parse(savedCompletedTips));
+      }
+    }, []);
+    useEffect(() => {
+      // Track user experience level based on completed tasks
+      const totalCompletedTasks = Taskcomplete.length;
+      if (totalCompletedTasks > 30) {
+        setUserExperience('advanced');
+        setShowAdvancedFeatures(true);
+      } else if (totalCompletedTasks > 10) {
+        setUserExperience('intermediate');
+      }
+    }, [Taskcomplete.length]);
+   
+     useEffect(() => {
+       if (reminders.length === 0) return;
+   
+       const interval = setInterval(() => {
+         const currentTime = new Date().toLocaleTimeString([], {
+           hour: "2-digit",
+           minute: "2-digit",
+           hour12: false,
+         });
+   
+
+         const triggeredReminders = reminders.filter((reminder) => reminder.time === currentTime);
+   
+         if (triggeredReminders.length > 0) {
+           triggeredReminders.forEach((reminder) => {
+             alert(`Reminder: ${reminder.text}`);
+           });
+
+           setReminders((prevReminders) =>
+             prevReminders.filter((reminder) => !triggeredReminders.includes(reminder))
+           );
+         }
+       }, 1000);
+   
+       return () => clearInterval(interval);
+     }, [reminders]);
+   
+
+  // Add ref for task input
+  const taskInputRef = React.useRef(null);
+
+  // Add keyboard shortcut handler
+  useKeyboardShortcut('t', () => {
+    if (taskInputRef.current) {
+      taskInputRef.current.focus();
+    }
+  });
+
+  return (
+    <>
+      {showBackToTop && (
+      <div style={{
+        position: 'fixed',
+        bottom: '90px',
+        right: '28px',
+        zIndex: 1000
+      }}>
+        <button
+          onClick={scrollToTop}
+          style={{
+            backgroundColor: '#77BFA3',
+            color: '#FAF3DD',
+            border: 'none',
+            borderRadius: '50%',
+            width: '45px',
+            height: '45px',
+            fontSize: '20px',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.transform = 'scale(1.1)';
+            e.target.style.backgroundColor = '#4A6656';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'scale(1)';
+            e.target.style.backgroundColor = '#77BFA3';
+          }}
+        >
+          <FaArrowUp />
+        </button>
+      </div>
+    )}
+
+    <div style={{
     position: 'fixed',
-    bottom: '90px',
-    right: '28px',
+    bottom: '20px',
+    right: '20px',
     zIndex: 1000
   }}>
-    <button
-      onClick={scrollToTop}
-      style={{
-        backgroundColor: '#77BFA3',
-        color: '#FAF3DD',
-        border: 'none',
-        borderRadius: '50%',
-        width: '45px',
-        height: '45px',
-        fontSize: '20px',
-        boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-      onMouseOver={(e) => {
-        e.target.style.transform = 'scale(1.1)';
-        e.target.style.backgroundColor = '#4A6656';
-      }}
-      onMouseOut={(e) => {
-        e.target.style.transform = 'scale(1)';
-        e.target.style.backgroundColor = '#77BFA3';
-      }}
-    >
-      <FaArrowUp />
-    </button>
-  </div>
-)}
-
-  <div style={{
-  position: 'fixed',
-  bottom: '20px',
-  right: '20px',
-  zIndex: 1000
-}}>
   <button
     onClick={() => setShowLearningTips(!showLearningTips)}
     style={{
@@ -705,6 +762,7 @@ return (
           Task Subject
         </label>
         <input
+          ref={taskInputRef}
           className="form-control"
           type="text"
           placeholder="Enter the Task Name Here"
@@ -1113,51 +1171,84 @@ return (
   maxWidth: "100%"
 
 }}>
- <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 mb-4">
-  <div className="d-flex flex-column flex-sm-row gap-2 w-100 justify-content-center" style={{ maxWidth: "600px" }}>
-    <button
-      className={`btn ${activeTab === 'active' ? 'btn-success' : 'btn-outline-success'}`}
-      onClick={() => setActiveTab('active')}
-      style={{
-        backgroundColor: activeTab === 'active' ? "#77BFA3" : "#ffffff",
-        color: activeTab === 'active' ? "#ffffff" : "#77BFA3",
-        border: "2px solid #77BFA3",
-        width: "100%",
-        maxWidth: "200px"
-      }}
-    >
-      Active Tasks ({totalActiveTasks})
-    </button>
-    <button
-      className={`btn ${activeTab === 'completed' ? 'btn-success' : 'btn-outline-success'}`}
-      onClick={() => setActiveTab('completed')}
-      style={{
-        backgroundColor: activeTab === 'completed' ? "#77BFA3" : "#ffffff",
-        color: activeTab === 'completed' ? "#ffffff" : "#77BFA3",
-        border: "2px solid #77BFA3",
-        width: "100%",
-        maxWidth: "200px"
-      }}
-    >
-      Completed Tasks ({totalCompletedTasks})
-    </button>
-  </div>
-  
-  <div className="w-100" style={{ maxWidth: "300px" }}>
-    <input
-      type="text"
-      placeholder="Search tasks..."
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="form-control"
-      style={{
-        backgroundColor: "#FAF3DD",
-        border: "2px solid #D4A373",
-        width: "100%"
-      }}
-    />
-  </div>
-</div>
+ <div className="d-flex justify-content-center mb-4">
+        <button
+          onClick={() => setShowCalendar(!showCalendar)}
+          style={{
+            ...commonButtonStyles,
+            marginBottom: "20px"
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = "#4A6656";
+            e.target.style.transform = "translateY(-2px)";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = "#77BFA3";
+            e.target.style.transform = "translateY(0)";
+          }}
+        >
+          {showCalendar ? "Hide Calendar" : "Show Calendar"}
+        </button>
+      </div>
+
+      {showCalendar && (
+        <div style={{ marginBottom: "30px" }}>
+          <Calendar 
+            Tasks={Tasks}
+            Taskwith={Taskwith}
+            expandedTasks={expandedTasks}
+            toggleTaskDetails={toggleTaskDetails}
+          />
+        </div>
+      )}
+
+      <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 mb-4">
+        <div className="d-flex flex-column flex-sm-row gap-2 w-100 justify-content-center" style={{ maxWidth: "600px" }}>
+          <button
+            className={`btn ${activeTab === 'active' ? 'btn-success' : 'btn-outline-success'}`}
+            onClick={() => setActiveTab('active')}
+            style={{
+              ...commonButtonStyles,
+              backgroundColor: activeTab === 'active' ? "#77BFA3" : "#ffffff",
+              color: activeTab === 'active' ? "#ffffff" : "#77BFA3",
+              border: "2px solid #77BFA3",
+              width: "100%",
+              maxWidth: "200px"
+            }}
+          >
+            Active Tasks ({totalActiveTasks})
+          </button>
+          <button
+            className={`btn ${activeTab === 'completed' ? 'btn-success' : 'btn-outline-success'}`}
+            onClick={() => setActiveTab('completed')}
+            style={{
+              ...commonButtonStyles,
+              backgroundColor: activeTab === 'completed' ? "#77BFA3" : "#ffffff",
+              color: activeTab === 'completed' ? "#ffffff" : "#77BFA3",
+              border: "2px solid #77BFA3",
+              width: "100%",
+              maxWidth: "200px"
+            }}
+          >
+            Completed Tasks ({totalCompletedTasks})
+          </button>
+        </div>
+        
+        <div className="w-100" style={{ maxWidth: "300px" }}>
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="form-control"
+            style={{
+              backgroundColor: "#FAF3DD",
+              border: "2px solid #D4A373",
+              width: "100%"
+            }}
+          />
+        </div>
+      </div>
   {activeTab === 'active' ? (
     <>
 <div className="mb-3 d-flex flex-column gap-2">
@@ -2039,8 +2130,11 @@ return (
     </div>
   </div>
 </div>
+
+
   </>
 );
 }
+
 export default Tasks;
 
